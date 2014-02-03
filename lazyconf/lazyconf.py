@@ -1,7 +1,7 @@
 import os, json, re
 from fabric.api import *
 from fabric.colors import green, red
-
+from schema_merge import SchemaMerge
 # TODO: Prompt falling back to default schema.
 
 class Lazyconf():
@@ -60,21 +60,6 @@ class Lazyconf():
 
     def __full_bool_prompt(self, v, s):
         return self.deprompt_bool(prompt(s + '? (y/n)', default = self.prompt_bool(v), validate=r'^(y|n)$'))
-
-    class DiffDicts():
-        def __init__(self, schema, data):
-            self.schema = schema
-            self.data = data
-
-            self.set_schema = set(self.schema.keys())
-            self.set_data = set(self.data.keys())
-            self.intersect = self.set_schema.intersection(self.set_data)
-
-        def added(self):
-            return self.set_schema - self.intersect
-
-        def removed(self):
-            return self.set_data - self.intersect
 
     def __cfg(self, d, key_string):
         if len(d.keys()) == 0:
@@ -137,35 +122,6 @@ class Lazyconf():
         self.labels = {}
         self.lists = {}
 
-    def __recursive_dict_merge(self, schema, data, prefix = 'config'):
-        diff = self.DiffDicts(schema, data)
-
-        added = diff.added()
-        if added:
-            for a in added:
-                print(green("Adding " + str(prefix + '.' + a) + " to data."))
-                data[a] = schema[a]
-
-        removed = diff.removed()
-        if removed:
-            for r in removed:
-                print(red("Removing " + str(prefix + '.' + r) + " from data."))
-                del(data[r])
-
-        intersect = diff.intersect
-        if intersect:
-            for i in intersect:
-                if type(schema[i]) is dict and type(data[i]) is dict:
-                    self.__recursive_dict_merge(schema[i], data[i], prefix + '.' + i)
-                elif type(schema[i]) is dict:
-                    print(green("Adding " + str(prefix + '.' + i) + " to data."))
-                    data[i] = schema[i]
-                elif type(data[i]) is dict:
-                    print(green("Removing " + str(prefix + '.' + i) + " from data."))
-                    data[i] = schema[i]
-
-        del(diff)
-
     def __configure(self):
         path = self.project_dir + '/' + self.filename
         schema = self.__load_file(path + '.schema')
@@ -195,7 +151,9 @@ class Lazyconf():
 
         if data:
             print(green("Loaded data."))
-            self.__recursive_dict_merge(schema, data)
+            d = SchemaMerge(schema, data)
+            d.merge()
+
             self.data = data
         else:
             self.data = schema
