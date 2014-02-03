@@ -54,12 +54,14 @@ class Lazyconf():
             return self.labels[l]
         return l
 
+    def __full_bool_prompt(self, v, s):
+        return self.deprompt_bool(prompt(self.__get_label(s) + ' (y/n)?', default = self.prompt_bool(v), validate=r'^(y|n)$'))
+
     def __cfg(self, d, key_string):
 
         if '_enabled' in d.keys():
             s = '.'.join([key_string,'_enabled'])
-            release = prompt(self.__get_label(s) + ' (y/n)?', default = self.prompt_bool(d['_enabled']), validate=r'^(y|n)$')
-            d['_enabled'] = self.deprompt_bool(release)
+            d['_enabled'] = self.__full_bool_prompt(d['_enabled'], s)
             if d['_enabled'] is False:
                 return
 
@@ -84,8 +86,7 @@ class Lazyconf():
             elif t is str or t is unicode:
                 d[k] = prompt(self.__get_label(s) + ':', default = v)
             elif t is bool:
-                release = prompt(self.__get_label(s) + ' (y/n)?', default = self.prompt_bool(v), validate=r'^(y|n)$')
-                d[k] = self.deprompt_bool(release)
+                d[k] = self.__full_bool_prompt(v, s)
             elif t is int:
                 d[k] = prompt(self.__get_label(s) + ':', default = v)
 
