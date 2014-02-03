@@ -1,8 +1,7 @@
 import os, json, re
-from fabric.api import *
-from fabric.colors import green, red
+from schema_merge import SchemaMerge
 
-class Lazynew():
+class Lazyconf():
     def __init__(self, project_dir = "", filename = 'lazyconf.json'):
 
         # Project directory and filename
