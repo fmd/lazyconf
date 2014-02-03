@@ -1,5 +1,4 @@
-import os
-import json
+import os, json, re
 from fabric.api import *
 from distutils.util import strtobool
 from fabric.colors import green, red
@@ -13,7 +12,7 @@ class Lazyconf():
 
     def config(self):
 
-        # If we're configuring, fall back on schema if the file doesn't exist.
+        # If we're configuring, load schema first for internals
         self.load_data(True)
         self.__cfg(self.data, 'config')
         self.save()
@@ -59,7 +58,8 @@ class Lazyconf():
 
         if '_enabled' in d.keys():
             s = '.'.join([key_string,'_enabled'])
-            d['_enabled'] = self.deprompt_bool(prompt(self.__get_label(s) + ' (y/n)?', default = self.prompt_bool(d['_enabled'])))
+            release = prompt(self.__get_label(s) + ' (y/n)?', default = self.prompt_bool(d['_enabled']), validate=r'^(y|n)$')
+            d['_enabled'] = self.deprompt_bool(release)
             if d['_enabled'] is False:
                 return
 
@@ -75,13 +75,17 @@ class Lazyconf():
 
             list = self.__get_list(s)
             if list:
-                d[k] = self.__get_list_value(prompt(self.__get_label(s) + '(' + ','.join(list.keys()) + ')' + ':', default = self.__get_list_key(v,list)), list)
+                choices = '(' + ','.join(list.keys()) + ')'
+                re_choices = '^(' + '|'.join(list.keys()) + ')$'.encode('string_escape');
+
+                d[k] = self.__get_list_value(prompt(self.__get_label(s) + ' ' + choices + ':', default = self.__get_list_key(v,list), validate=re_choices), list)
             elif t is dict:
                 self.__cfg(v, s)
             elif t is str or t is unicode:
                 d[k] = prompt(self.__get_label(s) + ':', default = v)
             elif t is bool:
-                d[k] = self.deprompt_bool(prompt(self.__get_label(s) + ' (y/n)?', default = self.prompt_bool(v)))
+                release = prompt(self.__get_label(s) + ' (y/n)?', default = self.prompt_bool(v), validate=r'^(y|n)$')
+                d[k] = self.deprompt_bool(release)
             elif t is int:
                 d[k] = prompt(self.__get_label(s) + ':', default = v)
 
@@ -180,9 +184,9 @@ class Lazyconf():
         return ''
 
     def deprompt_bool(self, p): 
-        if p.lower() in ['y','yes','true']:
+        if p == 'y':
             return True
-        if p.lower() in ['n','no','false']:
+        if p == 'n':
             return False
         return None
 
