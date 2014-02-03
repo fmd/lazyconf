@@ -70,10 +70,10 @@ class Lazyconf():
             self.intersect = self.set_schema.intersection(self.set_data)
 
         def added(self):
-            self.set_schema - self.intersect
+            return self.set_schema - self.intersect
 
         def removed(self):
-            self.set_data - self.intersect
+            return self.set_data - self.intersect
 
     def __cfg(self, d, key_string):
 
@@ -123,6 +123,29 @@ class Lazyconf():
         self.labels = {}
         self.lists = {}
 
+    def __recursive_dict_merge(self, schema, data, prefix = 'config'):
+        diff = self.DiffDicts(schema, data)
+
+        added = diff.added()
+        if added:
+            for a in added:
+                print(green("Adding " + str(prefix + '.' + a) + " to data."))
+                data[a] = schema[a]
+
+        removed = diff.removed()
+        if removed:
+            for r in removed:
+                print(red("Removing " + str(prefix + '.' + r) + " from data."))
+                del(data[r])
+
+        intersect = diff.intersect
+        if intersect:
+            for i in intersect:
+                if type(schema[i]) is dict and type(data[i]) is dict:
+                    self.__recursive_dict_merge(schema[i], data[i], prefix + '.' + i)
+
+        del(diff)
+
     def __configure(self):
         path = self.project_dir + '/' + self.filename
         schema = self.__load_file(path + '.schema')
@@ -143,13 +166,12 @@ class Lazyconf():
         self.lists = self.internal['lists']
 
         if data:
-            diff = DiffDicts(schema, data)
-            print(added)
-            print(removed)
+            self.__recursive_dict_merge(schema, data)
 
-        
-        # Diff the two dicts.
-        # Added all added and remove all removed from data.
+        self.data = data
+        self.__cfg(self.data, 'config')
+        self.save()
+
         # Set self.data to data and run configure.
         # Save the data file.
         pass
