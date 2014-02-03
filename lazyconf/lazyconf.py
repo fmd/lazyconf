@@ -92,18 +92,17 @@ class Lazyconf():
 
     def __init__(self, project_dir, filename = 'lazyconf.json'):
 
-        ### Project directory and filename ###
+        # Project directory and filename
         if len(project_dir) == 0:
             project_dir = '.'
 
         self.project_dir = project_dir
-
         self.filename = filename
 
+        # Data dictionaries
         self.data = {}
-
+        self.internal = {}
         self.labels = {}
-
         self.lists = {}
 
     def load_schema(self):
@@ -126,29 +125,32 @@ class Lazyconf():
         else:
             print(green("Loaded schema from " + path + ".schema"))
 
-    def load_data(self, fallback = True):
+    def load_data(self, schema = True):
 
         # Set the path to the values from __init__.
         path = self.project_dir + '/' + self.filename
 
-        # If we can't find the file in the folder and we're falling back ot schema, call load_schema.
+        if schema:
+            self.load_schema()
+        
         if not self.load_file(path):
-            if fallback:
-                self.load_schema()
-            else:
-                print(red("Fatal: Could not load schema from " + path + ". Aborting..."))
-                exit()
+            print(red("Could not load data from " + path + "."))
+            if not schema:
+                return
 
     def load_file(self, path, schema = False):
         if schema:
             path += '.schema'
         try:
             with open(path) as handle:
-
                 try:
                     self.data = json.load(handle)
-                    self.labels = self.data['_internal']['labels']
-                    self.lists = self.data['_internal']['lists']
+                    if schema:
+                        self.internal = self.data['_internal']
+                        del(self.data['_internal'])
+
+                        self.labels = self.internal['labels']
+                        self.lists = self.internal['lists']
                 except ValueError as e:
                     print(red('Error parsing JSON: ' + str(e)))
                     return None
