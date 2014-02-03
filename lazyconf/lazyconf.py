@@ -3,6 +3,8 @@ from fabric.api import *
 from distutils.util import strtobool
 from fabric.colors import green, red
 
+# TODO: Prompt falling back to default schema.
+
 class Lazyconf():
 
     def load_only_config(self):
@@ -52,13 +54,13 @@ class Lazyconf():
                 return k
         return ""
 
-    def __get_label(self, l):
+    def __get_label(self, l ,prefix = ""):
         if l in self.labels.keys():
-            return self.labels[l]
-        return l
+            return prefix + self.labels[l]
+        return prefix + l
 
     def __full_bool_prompt(self, v, s):
-        return self.deprompt_bool(prompt(self.__get_label(s) + ' (y/n)?', default = self.prompt_bool(v), validate=r'^(y|n)$'))
+        return self.deprompt_bool(prompt(s + '? (y/n)', default = self.prompt_bool(v), validate=r'^(y|n)$'))
 
     class DiffDicts():
         def __init__(self, schema, data):
@@ -76,10 +78,19 @@ class Lazyconf():
             return self.set_data - self.intersect
 
     def __cfg(self, d, key_string):
+        if len(d.keys()) == 0:
+            return
+
+        key_parts = key_string.rsplit('.')
+        prefix = "--" * (len(key_parts) - 1)
+        header = prefix + "[" + self.__get_label(key_parts[-1]) + "]"
+        prefix += "--"
+
+        print(green(header))
 
         if '_enabled' in d.keys():
             s = '.'.join([key_string,'_enabled'])
-            d['_enabled'] = self.__full_bool_prompt(d['_enabled'], s)
+            d['_enabled'] = self.__full_bool_prompt(d['_enabled'], self.__get_label(s, prefix))
             if d['_enabled'] is False:
                 return
 
@@ -98,15 +109,15 @@ class Lazyconf():
                 choices = '(' + ','.join(list.keys()) + ')'
                 re_choices = '^(' + '|'.join(list.keys()) + ')$'.encode('string_escape');
 
-                d[k] = self.__get_list_value(prompt(self.__get_label(s) + ' ' + choices + ':', default = self.__get_list_key(v,list), validate=re_choices), list)
+                d[k] = self.__get_list_value(prompt(self.__get_label(s, prefix) + ' ' + choices + ':', default = self.__get_list_key(v,list), validate=re_choices), list)
             elif t is dict:
                 self.__cfg(v, s)
             elif t is str or t is unicode:
-                d[k] = prompt(self.__get_label(s) + ':', default = v)
+                d[k] = prompt(self.__get_label(s, prefix) + ':', default = v)
             elif t is bool:
-                d[k] = self.__full_bool_prompt(v, s)
+                d[k] = self.__full_bool_prompt(v, self.__get_label(s, prefix))
             elif t is int:
-                d[k] = prompt(self.__get_label(s) + ':', default = v)
+                d[k] = prompt(self.__get_label(s, prefix) + ':', default = v)
 
     def __init__(self, project_dir, filename = 'lazyconf.json'):
 
@@ -143,6 +154,12 @@ class Lazyconf():
             for i in intersect:
                 if type(schema[i]) is dict and type(data[i]) is dict:
                     self.__recursive_dict_merge(schema[i], data[i], prefix + '.' + i)
+                elif type(schema[i]) is dict:
+                    print(green("Adding " + str(prefix + '.' + i) + " to data."))
+                    data[i] = schema[i]
+                elif type(data[i]) is dict:
+                    print(green("Removing " + str(prefix + '.' + i) + " from data."))
+                    data[i] = schema[i]
 
         del(diff)
 
@@ -151,13 +168,15 @@ class Lazyconf():
         schema = self.__load_file(path + '.schema')
         
         if not schema:
-            print(red('Falling back to default schema...'))
+            fall = self.__full_bool_prompt("", "Fall back to default schema")
             schema = self.__load_file('./lazyconf.json.schema')
             if not schema:
                 print(red('Could not fall back to default schema. Aborting...'))
                 exit()
-
-        data = self.__load_file(path)
+            else:
+                print(green('Loaded default schema.'))
+        else:
+            print(green('Loaded schema.'))
 
         self.internal = schema['_internal']
         del(schema['_internal'])
@@ -165,10 +184,15 @@ class Lazyconf():
         self.labels = self.internal['labels']
         self.lists = self.internal['lists']
 
-        if data:
-            self.__recursive_dict_merge(schema, data)
+        data = self.__load_file(path)
 
-        self.data = data
+        if data:
+            print(green("Loaded data."))
+            self.__recursive_dict_merge(schema, data)
+            self.data = data
+        else:
+            self.data = schema
+            
         self.__cfg(self.data, 'config')
         self.save()
 
