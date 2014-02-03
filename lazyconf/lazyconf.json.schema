@@ -13,18 +13,30 @@
         "user": "", 
         "name": ""
     }, 
-    "labels": {
-        "config.cache.backend": "Caching backend:", 
-        "config.cache.location": "Caching location:",
-        "config.cache.enabled": "Enable caching?",
-        "config.project.dir": "Full path to project:",
-        "config.env.debug": "Debug mode on?",
-        "config.db.engine":"Database Engine:",
-        "config.db.name":"Database name (Not username!):",
-        "config.db.user":"Database username:",
-        "config.db.pass":"Database password:"
-    }, 
     "env": {
         "debug": true
+    },
+
+    "_internal" : {
+        "labels": {
+            "config.cache.backend": "Caching backend:", 
+            "config.cache.location": "Caching location:",
+            "config.cache.enabled": "Enable caching?",
+            "config.project.dir": "Full path to project:",
+            "config.env.debug": "Debug mode on?",
+            "config.db.engine":"Database Engine:",
+            "config.db.name":"Database name (Not username!):",
+            "config.db.user":"Database username:",
+            "config.db.pass":"Database password:"
+        },
+        "lists": {
+            "config.db.engine": {
+                "postgres" : "django.db.backends.postgresql_psycopg2",
+                "mysql"    : "django.db.backends.mysql",
+            },
+            "config.cache.backend": {
+                "memcached" : "django.core.cache.backends.memcached.MemcachedCache"
+            }
+        }
     }
 }
