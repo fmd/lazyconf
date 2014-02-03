@@ -6,8 +6,15 @@ from fabric.colors import green, red
 
 class Lazyconf():
 
+    def load_only_config(self):
+
+        # If we're loading the config to actually serve, we can't fall back.
+        self.load_data(False)
+
     def config(self):
-        self.load()
+
+        # If we're configuring, fall back on schema if the file doesn't exist.
+        self.load_data(True)
         self.__cfg(self.data, 'config')
         self.save()
 
@@ -27,16 +34,32 @@ class Lazyconf():
                 v = ''
         return
 
+    def __get_list(self, k):
+        if k in self.lists.keys():
+            return self.lists[k]
+        return None
+
+    def __get_list_value(self, k, l):
+        if k in l.keys():
+            return l[k]
+        return ""
+
+    def __get_list_key(self, v, l):
+        for k,val in l.iteritems():
+            if v == val:
+                return k
+        return ""
+
     def __get_label(self, l):
-        if l in self.data['_internal']['labels'].keys():
-            return self.data['_internal']['labels'][l]
+        if l in self.labels.keys():
+            return self.labels[l]
         return l
 
     def __cfg(self, d, key_string):
 
         if '_enabled' in d.keys():
             s = '.'.join([key_string,'_enabled'])
-            d['_enabled'] = self.deprompt_bool(prompt(self.__get_label(s), default = self.prompt_bool(d['_enabled'])))
+            d['_enabled'] = self.deprompt_bool(prompt(self.__get_label(s) + ' (y/n)?', default = self.prompt_bool(d['_enabled'])))
             if d['_enabled'] is False:
                 return
 
@@ -50,14 +73,17 @@ class Lazyconf():
             t = type(v)
             s = '.'.join([key_string,k])
 
-            if t is dict:
+            list = self.__get_list(s)
+            if list:
+                d[k] = self.__get_list_value(prompt(self.__get_label(s) + '(' + ','.join(list.keys()) + ')' + ':', default = self.__get_list_key(v,list)), list)
+            elif t is dict:
                 self.__cfg(v, s)
             elif t is str or t is unicode:
-                d[k] = prompt(self.__get_label(s), default = v)
+                d[k] = prompt(self.__get_label(s) + ':', default = v)
             elif t is bool:
-                d[k] = self.deprompt_bool(prompt(self.__get_label(s), default = self.prompt_bool(v)))
+                d[k] = self.deprompt_bool(prompt(self.__get_label(s) + ' (y/n)?', default = self.prompt_bool(v)))
             elif t is int:
-                d[k] = prompt(self.__get_label(s), default = v)
+                d[k] = prompt(self.__get_label(s) + ':', default = v)
 
     def __init__(self, project_dir, filename = 'lazyconf.json'):
 
@@ -75,26 +101,49 @@ class Lazyconf():
 
         self.lists = {}
 
-    def load(self, path = None):
+    def load_schema(self):
+        
+        # Set the path to the values from __init__.
+        path = self.project_dir + '/' + self.filename
+
+        # If we can't find a schema file in that folder, load the default schema.
+        if not self.load_file(path, True):
+            print(red("Could not load schema from " + path + ". Falling back to default..."))
+
+            bkp_path = './' + self.filename
+
+            # If we can't find the default schema, we cannot continue.
+            if not self.load_file(bkp_path, True):
+                print(red("Fatal: Could not load default schema from " + bkp_path + ". Aborting..."))
+                exit()
+            else:
+                print(green("Loaded default schema."))
+        else:
+            print(green("Loaded schema from " + path + ".schema"))
+
+    def load_data(self, fallback = True):
+
+        # Set the path to the values from __init__.
+        path = self.project_dir + '/' + self.filename
+
+        # If we can't find the file in the folder and we're falling back ot schema, call load_schema.
         if not self.load_file(path):
-            if not self.load_file(path, True):
-                if not self.load_file('./' + self.filename, True):
-                    print(red("Fatal: Could not load JSON file, schema, or local schema. Aborting..."))
-                    exit()
+            if fallback:
+                self.load_schema()
+            else:
+                print(red("Fatal: Could not load schema from " + path + ". Aborting..."))
+                exit()
 
-        self.labels = self.data['_internal']['labels']
-        self.lists = self.data['_internal']['lists']
-
-    def load_file(self, path = None, schema = False):
-        if path is None:
-            path = self.project_dir + '/' + self.filename
+    def load_file(self, path, schema = False):
         if schema:
             path += '.schema'
         try:
             with open(path) as handle:
-                print(green("Loading JSON from " + path))
+
                 try:
                     self.data = json.load(handle)
+                    self.labels = self.data['_internal']['labels']
+                    self.lists = self.data['_internal']['lists']
                 except ValueError as e:
                     print(red('Error parsing JSON: ' + str(e)))
                     return None
