@@ -199,64 +199,6 @@ class Lazyconf():
 
         return data
 
-    def load_schema(self):
-        
-        # Set the path to the values from __init__.
-        path = self.project_dir + '/' + self.filename + '.schema'
-
-        # If we can't find a schema file in that folder, load the default schema.
-        if not self.load_file(path, True):
-            print(red("Could not load schema from " + path + ". Falling back to default..."))
-
-            bkp_path = './' + self.filename
-
-            # If we can't find the default schema, we cannot continue.
-            if not self.load_file(bkp_path, True):
-                print(red("Fatal: Could not load default schema from " + bkp_path + ". Aborting..."))
-                exit()
-            else:
-                print(green("Loaded default schema."))
-        else:
-            print(green("Loaded schema from " + path))
-
-    def load_data(self, schema = True):
-
-        # Set the path to the values from __init__.
-        path = self.project_dir + '/' + self.filename
-
-        if schema:
-            self.load_schema()
-        
-        if not self.load_file(path):
-            print(red("Could not load data from " + path + "."))
-            if not schema:
-                return
-
-    def load_file(self, path, schema = False):
-        try:
-            with open(path) as handle:
-                try:
-                    self.data = json.load(handle)
-                    if schema:
-                        self.internal = self.data['_internal']
-                        del(self.data['_internal'])
-
-                        self.labels = self.internal['labels']
-                        self.lists = self.internal['lists']
-
-                except ValueError as e:
-                    print(red('Error parsing JSON: ' + str(e)))
-                    return None
-                if type(self.data) is not dict:
-                    print(red('Error parsing JSON from file ' + path))
-                    return None
-                handle.close()
-        except IOError as e:
-            print(red('Could not load file: ' + str(e)))
-            return None
-
-        return True
-
     def save(self, d = None, f = None):
         if not d:
             d = self.data
