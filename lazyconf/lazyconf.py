@@ -28,23 +28,23 @@ class Lazyconf():
         return
 
     def __get_label(self, l):
-        if l in self.data['labels'].keys():
-            return self.data['labels'][l]
+        if l in self.data['_internal']['labels'].keys():
+            return self.data['_internal']['labels'][l]
         return l
 
     def __cfg(self, d, key_string):
 
-        if 'enabled' in d.keys():
-            s = '.'.join([key_string,'enabled'])
-            d['enabled'] = self.deprompt_bool(prompt(self.__get_label(s), default = self.prompt_bool(d['enabled'])))
-            if d['enabled'] is False:
+        if '_enabled' in d.keys():
+            s = '.'.join([key_string,'_enabled'])
+            d['_enabled'] = self.deprompt_bool(prompt(self.__get_label(s), default = self.prompt_bool(d['_enabled'])))
+            if d['_enabled'] is False:
                 return
 
         for k, v in d.iteritems():
-            if key_string == 'config.labels':
+            if key_string == 'config._internal':
                 return
 
-            if k == 'enabled':
+            if k == '_enabled':
                 continue
             
             t = type(v)
@@ -69,19 +69,11 @@ class Lazyconf():
 
         self.filename = filename
 
-        ### Dictionary of available database engines ###
-        self.db_engines = {
-            'postgres' : 'django.db.backends.postgresql_psycopg2',
-            'mysql'    : 'django.db.backends.mysql',
-        }
-
-        ### Dictionary of available caching backends ###
-        self.cache_backends = {
-            'memcached' : 'django.core.cache.backends.memcached.MemcachedCache',
-        }
-
-        ### Skeletal lazyconf.json in dictionary form ###
         self.data = {}
+
+        self.labels = {}
+
+        self.lists = {}
 
     def load(self, path = None):
         if not self.load_file(path):
@@ -89,6 +81,9 @@ class Lazyconf():
                 if not self.load_file('./' + self.filename, True):
                     print(red("Fatal: Could not load JSON file, schema, or local schema. Aborting..."))
                     exit()
+
+        self.labels = self.data['_internal']['labels']
+        self.lists = self.data['_internal']['lists']
 
     def load_file(self, path = None, schema = False):
         if path is None:

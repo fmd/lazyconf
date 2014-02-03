@@ -3,7 +3,7 @@
         "dir": ""
     }, 
     "cache": {
-        "enabled": false, 
+        "_enabled": false, 
         "location": "127.0.0.1:11211", 
         "backend": "memcached"
     }, 
