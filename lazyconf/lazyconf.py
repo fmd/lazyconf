@@ -172,30 +172,6 @@ class Lazyconf():
             print(green('Saved data to file: ' + f))
 
     ### Prompt/Deprompt functions ###
-    def prompt_db_engine(self, p):
-        for key, engine in self.db_engines.iteritems():
-            if p == engine:
-                return key
-        return ''
-
-    def deprompt_db_engine(self, p):
-        engine = self.db_engines[p]
-        if len(engine) > 0:
-            return engine
-        return None
-
-    def prompt_cache_backend(self, p):
-        for key, backend in self.cache_backends.iteritems():
-            if p == backend:
-                return key
-        return ''
-
-    def deprompt_cache_backend(self, p):
-        engine = self.cache_backends[p]
-        if len(engine) > 0:
-            return engine
-        return None
-
     def prompt_bool(self, p):
         if p is True:
             return 'y'
