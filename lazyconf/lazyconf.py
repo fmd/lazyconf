@@ -1,6 +1,5 @@
 import os, json, re
 from fabric.api import *
-from distutils.util import strtobool
 from fabric.colors import green, red
 
 # TODO: Prompt falling back to default schema.
@@ -83,8 +82,12 @@ class Lazyconf():
 
         key_parts = key_string.rsplit('.')
         prefix = "--" * (len(key_parts) - 1)
-        header = prefix + "[" + self.__get_label(key_parts[-1]) + "]"
-        prefix += "--"
+        label = self.__get_label(key_string)
+        if label is key_string:
+            label = key_parts[-1]
+
+        header = prefix + " [" + label  + "]"
+        prefix = prefix + "-- "
 
         print(green(header))
 
@@ -169,6 +172,10 @@ class Lazyconf():
         
         if not schema:
             fall = self.__full_bool_prompt("", "Fall back to default schema")
+            if not fall:
+                print(red("Did not fall back to default schema. Aborting..."))
+                exit()
+
             schema = self.__load_file('./lazyconf.json.schema')
             if not schema:
                 print(red('Could not fall back to default schema. Aborting...'))
