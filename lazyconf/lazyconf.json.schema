@@ -1,0 +1,30 @@
+{
+    "project": {
+        "dir": ""
+    }, 
+    "cache": {
+        "enabled": false, 
+        "location": "127.0.0.1:11211", 
+        "backend": "memcached"
+    }, 
+    "db": {
+        "engine": "", 
+        "pass": "", 
+        "user": "", 
+        "name": ""
+    }, 
+    "labels": {
+        "config.cache.backend": "Caching backend:", 
+        "config.cache.location": "Caching location:",
+        "config.cache.enabled": "Enable caching?",
+        "config.project.dir": "Full path to project:",
+        "config.env.debug": "Debug mode on?",
+        "config.db.engine":"Database Engine:",
+        "config.db.name":"Database name (Not username!):",
+        "config.db.user":"Database username:",
+        "config.db.pass":"Database password:"
+    }, 
+    "env": {
+        "debug": true
+    }
+}
