@@ -1,5 +1,6 @@
 {
     "project": {
+        "_enabled":false,
         "dir": ""
     }, 
     "cache": {
@@ -14,13 +15,19 @@
         "name": ""
     }, 
     "env": {
-        "debug": true
+        "debug": true,
     },
 
     "_internal" : {
         "labels": {
+            "config.project": "Project Settings",
+            "config.cache": "Cache Settings",
+            "config.db": "Database Connection",
+            "config.env": "Application Environment",
+
             "config.cache.backend": "Caching backend", 
             "config.cache.location": "Caching location",
+            "config.project._enabled": "Enable project settings",
             "config.cache._enabled": "Enable caching",
             "config.project.dir": "Full path to project",
             "config.env.debug": "Debug mode",
