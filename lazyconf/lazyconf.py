@@ -57,6 +57,21 @@ class Lazyconf():
     def __full_bool_prompt(self, v, s):
         return self.deprompt_bool(prompt(self.__get_label(s) + ' (y/n)?', default = self.prompt_bool(v), validate=r'^(y|n)$'))
 
+    class DiffDicts():
+        def __init__(self, schema, data):
+            self.schema = schema
+            self.data = data
+
+            self.set_schema = set(self.schema.keys())
+            self.set_data = set(self.data.keys())
+            self.intersect = self.set_schema.intersection(self.set_data)
+
+        def added(self):
+            self.set_schema - self.intersect
+
+        def removed(self):
+            self.set_data - self.intersect
+
     def __cfg(self, d, key_string):
 
         if '_enabled' in d.keys():
@@ -105,10 +120,30 @@ class Lazyconf():
         self.labels = {}
         self.lists = {}
 
+    def __configure(self):
+        
+        
+        # Load the schema file.
+        # Load the json file.
+        # Load internals and remove from dict.
+        # Diff the two dicts.
+        # Added all added and remove all removed from data.
+        # Set self.data to data and run configure.
+        # Save the data file.
+        pass
+
+    def __no_configure(self):
+        # Set self.data as only what was loaded in the json file. Do not fall back on schema.
+        pass
+
+    def __load_file(self, path):
+        # Load the file in path, and return all the data
+        pass
+
     def load_schema(self):
         
         # Set the path to the values from __init__.
-        path = self.project_dir + '/' + self.filename
+        path = self.project_dir + '/' + self.filename + '.schema'
 
         # If we can't find a schema file in that folder, load the default schema.
         if not self.load_file(path, True):
@@ -123,7 +158,7 @@ class Lazyconf():
             else:
                 print(green("Loaded default schema."))
         else:
-            print(green("Loaded schema from " + path + ".schema"))
+            print(green("Loaded schema from " + path))
 
     def load_data(self, schema = True):
 
@@ -139,8 +174,6 @@ class Lazyconf():
                 return
 
     def load_file(self, path, schema = False):
-        if schema:
-            path += '.schema'
         try:
             with open(path) as handle:
                 try:
@@ -151,6 +184,7 @@ class Lazyconf():
 
                         self.labels = self.internal['labels']
                         self.lists = self.internal['lists']
+
                 except ValueError as e:
                     print(red('Error parsing JSON: ' + str(e)))
                     return None
