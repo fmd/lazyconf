@@ -10,6 +10,9 @@ class Lazyconf():
         # If we're loading the config to actually serve, we can't fall back.
         self.load_data(False)
 
+    def t(self):
+        self.__configure()
+
     def config(self):
 
         # If we're configuring, load schema first for internals
@@ -121,11 +124,30 @@ class Lazyconf():
         self.lists = {}
 
     def __configure(self):
+        path = self.project_dir + '/' + self.filename
+        schema = self.__load_file(path + '.schema')
         
+        if not schema:
+            print(red('Falling back to default schema...'))
+            schema = self.__load_file('./lazyconf.json.schema')
+            if not schema:
+                print(red('Could not fall back to default schema. Aborting...'))
+                exit()
+
+        data = self.__load_file(path)
+
+        self.internal = schema['_internal']
+        del(schema['_internal'])
+
+        self.labels = self.internal['labels']
+        self.lists = self.internal['lists']
+
+        if data:
+            diff = DiffDicts(schema, data)
+            print(added)
+            print(removed)
+
         
-        # Load the schema file.
-        # Load the json file.
-        # Load internals and remove from dict.
         # Diff the two dicts.
         # Added all added and remove all removed from data.
         # Set self.data to data and run configure.
@@ -137,8 +159,23 @@ class Lazyconf():
         pass
 
     def __load_file(self, path):
-        # Load the file in path, and return all the data
-        pass
+        data = None
+        try:
+            with open(path) as handle:
+                try:
+                    data = json.load(handle)
+                except ValueError as e:
+                    print(red('Error parsing JSON: ' + str(e)))
+                    return None
+                if type(data) is not dict:
+                    print(red('Error parsing JSON from file ' + path))
+                    return None
+                handle.close()
+        except IOError as e:
+            print(red('Could not load file: ' + str(e)))
+            return None
+
+        return data
 
     def load_schema(self):
         
@@ -228,4 +265,4 @@ class Lazyconf():
         return None
 
 lz = Lazyconf(os.path.dirname(__file__))
-lz.config()
+lz.t()
