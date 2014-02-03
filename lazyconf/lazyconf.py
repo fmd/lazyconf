@@ -6,17 +6,22 @@ from fabric.colors import green, red
 class Ezconf():
     def __init__(self, project_dir, filename = 'config.json'):
 
-        # Project directory and filename
+        ### Project directory and filename ###
         self.project_dir = project_dir
         self.filename = filename
 
-        # Dictionary of available database engines
-        self.engines = {
+        ### Dictionary of available database engines ###
+        self.db_engines = {
             'postgres' : 'django.db.backends.postgresql_psycopg2',
             'mysql'    : 'django.db.backends.mysql',
         }
 
-        # Skeletal config.json in dictionary form
+        ### Dictionary of available caching backends ###
+        self.cache_backends = {
+            'memcached' : 'django.core.cache.backends.memcached.MemcachedCache',
+        }
+
+        ### Skeletal config.json in dictionary form ###
         self.data = {
             'cache' : {
                 'enabled'  : False,
@@ -42,7 +47,7 @@ class Ezconf():
             },
         }
 
-    # Loading from and saving to file
+    ### Loading from and saving to file ###
     def load(self):
         try:
             with open(self.project_dir + '/' + self.filename) as handle:
@@ -56,7 +61,19 @@ class Ezconf():
         with open(self.project_dir + '/' + self.filename, 'w') as handle:
             json.dump(self.data, handle, indent=4)
 
-    # Prompt/Deprompt functions
+    ### Prompt/Deprompt functions ###
+    def prompt_db_engine(self, p):
+        pass
+
+    def deprompt_db_engine(self, p):
+        pass
+
+    def prompt_cache_backend(self, p):
+        pass
+
+    def depromp_cache_backend(self, p):
+        pass
+
     def prompt_bool(self, p):
         if p is True:
             return 'y'
