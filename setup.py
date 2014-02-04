@@ -12,7 +12,6 @@ setup(
     description='Lazy config and deployment for Django.',
     long_description=open('README.rst').read(),
     install_requires=[
-        "Django >= 1.4",
         "Fabric >= 1.8"
     ],
 )
