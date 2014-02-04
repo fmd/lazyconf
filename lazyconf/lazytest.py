@@ -20,7 +20,7 @@ class Lazyconf():
         # Load the schema from a file.
         try:
             schema.load(schema_file)
-        except e:
+        except Exception as e:
             self.prompt.error(str(e) + ". Aborting...")
         else:
             self.prompt.success("Successfully loaded schema from " + schema_file)
@@ -28,10 +28,11 @@ class Lazyconf():
         # Load the data from a file.
         try:
             data.load(data_file)
-        except e:
-            self.prompt.error(str(e) + ". Aborting...")
+        except Exception as e:
+            self.prompt.error(str(e))
+            
         else:
             self.prompt.success("Successfully loaded data from " + data_file)
 
 c = Lazyconf()
-c.configure('./lazyconf.json', './lazyconf.json.schema')
+c.configure('./lazyconf.json.schema', './lazyconf.json')
