@@ -1,6 +1,6 @@
 import os, json, re
 from fabric.api import *
-from fabric.colors import green, red
+from fabric.colors import green, red, blue
 from schema_merge import SchemaMerge
 # TODO: Prompt falling back to default schema.
 
@@ -152,7 +152,15 @@ class Lazyconf():
         if data:
             print(green("Loaded data."))
             d = SchemaMerge(schema, data)
-            d.merge()
+            mods = d.merge()
+            for a in mods['added']:
+                print(green("Added " + a + " to data."))
+
+            for r in mods['removed']:
+                print(red("Removed " + r + " from data."))
+
+            for k,m in mods['modified']:
+                print(blue("Modified " + k + ": " + m[0] + " became " + m[1] + "." ))
 
             self.data = data
         else:
