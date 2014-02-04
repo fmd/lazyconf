@@ -8,7 +8,15 @@ class Schema():
         self.prefix = prefix
 
     def get(self, key):
-        pass
+        if not self.data:
+            return None
+        
+        parts = key.rsplit('.')
+        v = self.data
+        for p in parts:
+            v = v.get(p)
+
+        return v
 
     def load(self, path):
         data = None
@@ -30,7 +38,7 @@ class Schema():
         self.data = data
 
     def dump(self):
-        pass
+        return
 
 # Merge
 # This class is used to merge variables in the schema dictionary into the data dictionary, without losing defaults.
@@ -38,6 +46,8 @@ class Schema():
 # The schema dictionary is never be modified by this class.
 
 class Merge():
+
+    # Creating a M
     def __init__(self, schema, data):
         self.schema = schema
         self.data = data
@@ -60,10 +70,10 @@ class Merge():
 
         # Create the dictionary to be returned.
         mods = {
-                          # Example format:
-            'added':[],   # 'config.db.name'
-            'removed':[], # 'config.db.host'
-            'modified':[] # ('config.db.user', (bool, string))
+                            # Example format:
+            'added'   : [], # 'config.db.name'
+            'removed' : [], # 'config.db.host'
+            'modified': []  # ('config.db.user', (<type 'bool'>, <type 'string'>))
         }
 
         if schema is None:
