@@ -10,7 +10,7 @@ setup(
     url='https://www.github.com/fmd/django-lazyconf',
     license='LICENSE.rst',
     description='Lazy config and deployment for Django.',
-    long_description=open('README.txt').read(),
+    long_description=open('README.rst').read(),
     install_requires=[
         "Django >= 1.7",
         "Fabric >= 1.8.1"
