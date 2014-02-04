@@ -64,7 +64,7 @@ class Schema():
         # Try and save the file to the path.
         try:
             handle = open(path, 'w')
-            json.dump(d, handle, indent = 4)
+            json.dump(self.data, handle, indent = 4)
 
         # Raise an exception if we can't find the file.
         except IOError as e:
