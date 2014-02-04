@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name='django-lazyconf',
@@ -13,6 +13,6 @@ setup(
     long_description=open('README.rst').read(),
     install_requires=[
         "Django >= 1.4",
-        "Fabric >= 1.8.1"
+        "Fabric >= 1.8"
     ],
 )
