@@ -58,6 +58,7 @@ class Schema():
         handle.close()
         self.data = data
 
+    # Saves self.data to a file.
     def save(self, path):
 
         # Try and save the file to the path.
