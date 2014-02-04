@@ -15,7 +15,7 @@
         "name": ""
     }, 
     "env": {
-        "debug": true,
+        "debug": true
     },
 
     "_internal" : {
