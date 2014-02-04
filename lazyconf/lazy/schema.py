@@ -1,16 +1,33 @@
-# Data
+# Schema
 # This class is used to load and store a dictionary from a config file.
 # It contains methods to load data, dump data, and retrieve data from the dictionary.
 
-class Data():
+class Schema():
     def __init__(self, prefix = 'config'):
-        self.data = data
+        self.data = None
+        self.prefix = prefix
 
     def get(self, key):
         pass
 
     def load(self, path):
-        pass
+        data = None
+
+        try:
+            handle = open(path)
+        except IOError as e:
+            raise e
+
+        try:
+            data = json.load(handle)
+        except ValueError as e:
+            raise e
+
+        if type(data) is not dict:                    
+            raise Exception("Invalid schema")
+
+        handle.close()
+        self.data = data
 
     def dump(self):
         pass
