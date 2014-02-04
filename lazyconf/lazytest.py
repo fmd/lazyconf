@@ -22,6 +22,8 @@ class Lazyconf():
             schema.load(schema_file)
         except Exception as e:
             self.prompt.error(str(e) + ". Aborting...")
+            return
+
         else:
             self.prompt.success("Successfully loaded schema from " + schema_file)
 
@@ -30,7 +32,13 @@ class Lazyconf():
             data.load(data_file)
         except Exception as e:
             self.prompt.error(str(e))
-            
+
+            # If we can't load the data file, we can continue from the schema.
+            # If the data file path was entered incorrectly, we can abort.
+            cont = self.prompt.bool("Continue from schema", True)
+            if not cont:
+                self.prompt.error("Aborting...")
+                return
         else:
             self.prompt.success("Successfully loaded data from " + data_file)
 
