@@ -1,8 +1,26 @@
-# SchemaMerge
+# Data
+# This class is used to load and store a dictionary from a config file.
+# It contains methods to load data, dump data, and retrieve data from the dictionary.
+
+class Data():
+    def __init__(self, prefix = 'config'):
+        self.data = data
+
+    def get(self, key):
+        pass
+
+    def load(self, path):
+        pass
+
+    def dump(self):
+        pass
+
+# Merge
 # This class is used to merge variables in the schema dictionary into the data dictionary, without losing defaults.
 # It never returns the dictionaries, as the original dictionaries are passed by reference automatically.
+# The schema dictionary is never be modified by this class.
 
-class SchemaMerge():
+class Merge():
     def __init__(self, schema, data):
         self.schema = schema
         self.data = data
@@ -20,7 +38,7 @@ class SchemaMerge():
     def removed(self):
         return self.set_data - self.intersect
 
-    # This function recursively merges all changes in the schema into the data file.
+    # This method recursively merges all changes in the schema into the data file.
     def merge(self, schema = None, data = None, prefix = 'config'):
 
         # Create the dictionary to be returned.
@@ -51,18 +69,18 @@ class SchemaMerge():
                 mods['removed'].append(prefix + '.' + r)
                 del(data[r])
 
-        # Recursively call this function until all common variables are resolved.
+        # Recursively call this method until all common variables are resolved.
         intersect = self.intersect
         if intersect:
             for i in intersect:
                 s = type(schema[i])
                 d = type(data[i])
 
-                # If there is a dictionary that is shared at this key by both the schema and the data, call this function again.
+                # If there is a dictionary that is shared at this key by both the schema and the data, call this method again.
                 if s is dict and d is dict:
                     
                     # Create a new instance of this class with the child dicts as schema and data.
-                    diff = SchemaMerge(schema[i], data[i])
+                    diff = Merge(schema[i], data[i])
                     
                     # Merge the child dicts.
                     add_mods = diff.merge(prefix = prefix + '.' + i)
@@ -72,7 +90,7 @@ class SchemaMerge():
                     mods['removed'] += add_mods['removed']
                     mods['modified'] += add_mods['modified']
                     
-                    # Remove the created SchemaMerge.
+                    # Remove the created Merge.
                     del(diff)
 
                 # Otherwise if the variable type has changed, copy the variable from the schema to the data.
