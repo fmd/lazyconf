@@ -28,7 +28,7 @@ class Lazyconf():
             self.prompt.error(str(e) + ". Aborting...")
             return
         else:
-            self.prompt.success("Successfully loaded schema from " + schema_file)
+            self.prompt.success("Loaded schema from " + schema_file)
 
         # Load the data from a file.
         try:
@@ -43,7 +43,7 @@ class Lazyconf():
                 self.prompt.error("Aborting...")
                 return
         else:
-            self.prompt.success("Successfully loaded data from " + data_file)
+            self.prompt.success("Loaded data from " + data_file)
 
         # Store the internals of the schema (labels, lists, etc.) and delete it from the dictionary for merging.
         self.internal = schema.data['_internal']
