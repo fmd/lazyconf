@@ -3,7 +3,9 @@
 # It contains methods to load data, dump data, and retrieve data from the dictionary.
 
 class Schema():
-    def __init__(self, prefix = 'config'):
+
+    # Initialisation 
+    def __init__(self):
         self.data = None
         self.prefix = prefix
 
@@ -50,12 +52,12 @@ class Schema():
 
 class Merge():
 
-    # Creating a M
+    # Initialisation creates sets of the top level keys in both dictionaries, and the intersection between the two.
     def __init__(self, schema, data):
         self.schema = schema
         self.data = data
 
-        # Create sets of the top level keys in both dictionaries, and the intersection between the two.
+        # Create the sets.
         self.set_schema = set(self.schema.keys())
         self.set_data = set(self.data.keys())
         self.intersect = self.set_schema.intersection(self.set_data)
@@ -69,14 +71,18 @@ class Merge():
         return self.set_data - self.intersect
 
     # This method recursively merges all changes in the schema into the data file.
-    def merge(self, schema = None, data = None, prefix = 'config'):
-
+    def merge(self, schema = None, data = None, prefix = None):
+        
+        # If there's no prefix yet, don't add a '.'
+        p = ''
+        if prefix:
+            p = prefix + '.'
+        
         # Create the dictionary to be returned.
         mods = {
-                            # Example format:
-            'added'   : [], # 'config.db.name'
-            'removed' : [], # 'config.db.host'
-            'modified': []  # ('config.db.user', (<type 'bool'>, <type 'string'>))
+            'added'   : [], # []string
+            'removed' : [], # []string
+            'modified': []  # [](string,(type,type))
         }
 
         if schema is None:
@@ -89,14 +95,14 @@ class Merge():
         added = self.added()
         if added:
             for a in added:
-                mods['added'].append(prefix + '.' + a)
+                mods['added'].append(p + a)
                 data[a] = schema[a]
 
         # Remove all keys in data that are no longer in schema.
         removed = self.removed()
         if removed:
             for r in removed:
-                mods['removed'].append(prefix + '.' + r)
+                mods['removed'].append(p + r)
                 del(data[r])
 
         # Recursively call this method until all common variables are resolved.
@@ -113,7 +119,7 @@ class Merge():
                     diff = Merge(schema[i], data[i])
                     
                     # Merge the child dicts.
-                    add_mods = diff.merge(prefix = prefix + '.' + i)
+                    add_mods = diff.merge(prefix = p + i)
 
                     # Update our return dict.
                     mods['added'] += add_mods['added']
@@ -125,7 +131,7 @@ class Merge():
 
                 # Otherwise if the variable type has changed, copy the variable from the schema to the data.
                 elif s != d:
-                    m = (str(prefix + '.' + i) , (str(d),str(s)))
+                    m = (p, (str(d),str(s)))
                     mods['modified'].append(m)
                     data[i] = schema[i]
 
