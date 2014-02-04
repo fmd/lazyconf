@@ -28,7 +28,7 @@ class Prompt():
     ### Prompts ###
 
     # Returns the value from a validated bool prompt.
-    def prompt_bool(self, label, default = False):
+    def bool(self, label, default = False):
         val = prompt(label + '? (y/n)', default = self.fmt_bool(default), validate = r'^(y|n)$')
         return self.defmt_bool(val)
 
