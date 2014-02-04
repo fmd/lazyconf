@@ -1,7 +1,7 @@
-===============
-django-lazyconf
-===============
-django-lazyconf is an insultingly simple tool for configuring and deploying Django 1.7+ applications. 
+========
+lazyconf
+========
+lazyconf is an insultingly simple tool for configuring and deploying Django 1.7+ applications. 
 
 Dependencies
 ------------
