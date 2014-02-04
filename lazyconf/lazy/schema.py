@@ -1,6 +1,6 @@
-# Schema
-# This class is used to load and store a dictionary from a config file.
-# It contains methods to load data, dump data, and retrieve data from the dictionary.
+### Schema ###
+### This class is used to load and store a dictionary from a config file.
+### It contains methods to load data, dump data, and retrieve data from the dictionary.
 
 class Schema():
 
@@ -59,10 +59,10 @@ class Schema():
     def dump(self):
         return
 
-# Merge
-# This class is used to merge variables in the schema dictionary into the data dictionary, without losing defaults.
-# It never returns the dictionaries, as the original dictionaries are passed by reference automatically.
-# The schema dictionary is never be modified by this class.
+### Merge ###
+### This class is used to merge variables in the schema dictionary into the data dictionary, without losing defaults.
+### It never returns the dictionaries, as the original dictionaries are passed by reference automatically.
+### The schema dictionary is never be modified by this class.
 
 class Merge():
 
