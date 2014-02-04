@@ -14,7 +14,10 @@ class Schema():
         parts = key.rsplit('.')
         v = self.data
         for p in parts:
-            v = v.get(p)
+            try:
+                v = v.get(p)
+            except AttributeError as e:
+                return None
 
         return v
 
