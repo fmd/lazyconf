@@ -6,6 +6,8 @@ from fabric.colors import green, red, blue
 ### It also containers several formatting functions, which are currently just a convenience wrapper around printing Fabric colors.
 
 class Prompt():
+
+    # Initialisation
     def __init__(self):
         pass
 
@@ -13,15 +15,15 @@ class Prompt():
 
     # Prints a success message.
     def success(self, msg):
-        pass
+        print(green(msg))
 
     # Prints an error message.
     def error(self, msg):
-        pass
+        print(red(msg))
 
     # Prints a notice message.
     def notice(self, msg):
-        pass
+        print(blue(msg))
 
     ### Parsing ###
 
