@@ -14,5 +14,3 @@ class Lazyfiles():
         # Data dictionaries
         self.data = {}
         self.internal = {}
-
-    def 
