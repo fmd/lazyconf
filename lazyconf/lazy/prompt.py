@@ -15,11 +15,11 @@ class Prompt():
 
     # Prints a success message.
     def success(self, msg):
-        print(green(msg))
+        print(green("Success: " + msg))
 
     # Prints an error message.
     def error(self, msg):
-        print(red(msg))
+        print(red("Error: " + msg))
 
     # Prints a notice message.
     def notice(self, msg):
