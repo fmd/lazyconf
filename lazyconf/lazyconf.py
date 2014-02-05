@@ -141,10 +141,10 @@ class Lazyconf():
         self.data = data
 
         # Configure the data.
-        self.configure_data(data.data).
+        self.configure_data(data.data)
 
         # Save the data to the out file.
         self.data.save(out_file)
 
 c = Lazyconf()
-c.configure('./lazyconf.json.schema', './lazyconf.json', './lazyconf.json')
+c.configure('./schema/lazyconf.json.schema', './lazyconf.json', './lazyconf.json')
