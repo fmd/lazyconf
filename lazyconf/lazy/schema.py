@@ -9,6 +9,44 @@ class Schema():
     # Initialisation 
     def __init__(self):
         self.data = None
+        self.internal = None
+
+
+    # Gets the key from a value in a list.
+    def get_list_key(self, v, list):
+        for k,val in list.iteritems():
+            if v == val:
+                return k
+        return ""
+
+
+    # Gets the value from a key in a list.
+    def get_list_value(self, k, list):
+        if k in list.keys():
+            return list[k]
+        return ""
+
+
+    # Gets a list by its dot-notated key.
+    def get_list(self, k):
+        if k in self.internal['lists'].keys():
+            return self.internal['lists'][k]
+        return None
+
+
+    # Gets a label by its dot-notated key.
+    def get_label(self, label):
+        if label in self.internal['labels'].keys():
+            return self.internal['labels'][label]
+        return label
+
+
+    # Adds 'val' to 'key' in dot notation.
+    def get_key_string(self, key, val):
+        if key:
+            return '.'.join([key, val])
+        return val
+
 
     # Gets a value from dot format: s.get('project.cache.backend') in dict format: self.data['project']['cache']['backend']
     def get(self, key):
@@ -34,6 +72,7 @@ class Schema():
         # If we got the value successfully, return it.
         return v
 
+
     # Loads self.data from a file.
     def load(self, path):
         data = None
@@ -57,6 +96,11 @@ class Schema():
         # Store the dictionary.
         handle.close()
         self.data = data
+
+        if '_internal' in self.data.keys():
+            self.internal = self.data['_internal']
+            del(self.data['_internal'])
+
 
     # Saves self.data to a file.
     def save(self, path):
