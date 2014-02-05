@@ -1,158 +1,129 @@
-import os, json, re
-from fabric.api import *
-from fabric.colors import green, red, blue
-from lazy.schema import Merge
-# TODO: Prompt falling back to default schema.
+from lazy.prompt import *
+from lazy.schema import *
+from lazy.merge import *
+
+### Lazyconf ###
+### Our main class. These functions should all be chainable through Fabric for use on a remote server.
 
 class Lazyconf():
 
-    def load_only_config(self):
+    # Initialisation.
+    def __init__(self):
+        self.prompt = Prompt()
+        self.data = None
 
-        # If we're loading the config to actually serve, we can't fall back.
-        self.load_data(False)
 
-    def t(self):
-        self.__configure()
-
-    def config(self):
-
-        # If we're configuring, load schema first for internals
-        self.load_data(True)
-        self.__cfg(self.data, 'config')
-        self.save()
-
-    def save_schema(self):
-        d = self.data
-        self.__sv_schema(d)
-
-    def __sv_schema(self, d):
-        for k,v in d.iteritems():
-            if t is dict:
-                self.__sv_schema(d)
-            elif t is bool:
-                v = False
-            elif t is int:
-                v = 0
-            else:
-                v = ''
-        return
-
-    def __get_list(self, k):
-        if k in self.lists.keys():
-            return self.lists[k]
-        return None
-
-    def __get_list_value(self, k, l):
-        if k in l.keys():
-            return l[k]
-        return ""
-
-    def __get_list_key(self, v, l):
-        for k,val in l.iteritems():
-            if v == val:
-                return k
-        return ""
-
-    def __get_label(self, l ,prefix = ""):
-        if l in self.labels.keys():
-            return prefix + self.labels[l]
-        return prefix + l
-
-    def __full_bool_prompt(self, v, s):
-        return self.deprompt_bool(prompt(s + '? (y/n)', default = self.prompt_bool(v), validate=r'^(y|n)$'))
-
-    def __cfg(self, d, key_string):
-        if len(d.keys()) == 0:
+    # Goes through all the options in the data file, and prompts new values.
+    def configure_data(self, data, key_string = ''):
+        
+        # If there's no keys in this dictionary, we have nothing to do.
+        if len(data.keys()) == 0:
             return
 
+        # Split the key string by its dots to find out how deep we are.
         key_parts = key_string.rsplit('.')
         prefix = "--" * (len(key_parts) - 1)
-        label = self.__get_label(key_string)
-        if label is key_string:
-            label = key_parts[-1]
 
-        header = prefix + " [" + label  + "]"
+        # Attempt to get a label for this key string.
+        label = self.data.get_label(key_string)
+
+        # If we are have any key string or label, write the header for this section.
+        if label:
+            self.prompt.header(prefix + label)
+
+        # Add to the prefix to indicate options on this level.
         prefix = prefix + "-- "
 
-        print(green(header))
+        # If this section has an '_enabled' key, process it first, as it could enable or disable this whole section.
+        if '_enabled' in data.keys():
+            s = self.data.get_key_string(key_string, '_enabled')
 
-        if '_enabled' in d.keys():
-            s = '.'.join([key_string,'_enabled'])
-            d['_enabled'] = self.__full_bool_prompt(d['_enabled'], self.__get_label(s, prefix))
-            if d['_enabled'] is False:
+            #Prompt whether to enable this section. Use the existing value as the default.
+            data['_enabled'] = self.prompt.bool(prefix + self.data.get_label(s), data['_enabled'])
+
+            # Return if this section is now disabled.
+            if data['_enabled'] is False:
                 return
 
-        for k, v in d.iteritems():
-            if key_string == 'config._internal':
-                return
+        # Loop through the rest of the dictionary and prompt for every key. If the value is a dictionary, call this function again for the next level.
+        for k, v in data.iteritems():
 
+            # If we hit the '_enabled' key, we've already processed it (but still need it in the dictionary for saving). Ignore it.
             if k == '_enabled':
                 continue
             
+            # Get the type of the value at this key, and the dot-noted format of this key.
             t = type(v)
-            s = '.'.join([key_string,k])
+            s = self.data.get_key_string(key_string, k)
 
-            list = self.__get_list(s)
-            if list:
-                choices = '(' + ','.join(list.keys()) + ')'
-                re_choices = '^(' + '|'.join(list.keys()) + ')$'.encode('string_escape');
+            # See if this key has an associated list. If so, this type is a list type.
+            select = self.data.get_select(s)
+            if select:
+                data[k] = self.prompt.select(prefix + self.data.get_label(s), select, default = v)
 
-                d[k] = self.__get_list_value(prompt(self.__get_label(s, prefix) + ' ' + choices + ':', default = self.__get_list_key(v,list), validate=re_choices), list)
+            # If the value type is a dictionary, recall this function.
             elif t is dict:
-                self.__cfg(v, s)
-            elif t is str or t is unicode:
-                d[k] = prompt(self.__get_label(s, prefix) + ':', default = v)
+                self.configure_data(v, s)
+
+            # If the value type is a boolean, prompt a boolean.
             elif t is bool:
-                d[k] = self.__full_bool_prompt(v, self.__get_label(s, prefix))
+                data[k] = self.prompt.bool(prefix + self.data.get_label(s))
+
+            # TODO: Currently int and other numerical types work the same as strings.
             elif t is int:
-                d[k] = prompt(self.__get_label(s, prefix) + ':', default = v)
+                data[k] = prompt(prefix + self.data.get_label(s) + ':', default = str(v))
 
-    def __init__(self, project_dir, filename = 'lazyconf.json'):
+            # TODO: Currently we turn lists into empty strings.
+            elif t is list:
+                data[k] = prompt(prefix + self.data.get_label(s) + ':', default = "")
 
-        # Project directory and filename
-        if len(project_dir) == 0:
-            project_dir = '.'
-
-        self.project_dir = project_dir
-        self.filename = filename
-
-        # Data dictionaries
-        self.data = {}
-        self.internal = {}
-        self.labels = {}
-        self.lists = {}
-
-    def __configure(self):
-        path = self.project_dir + '/' + self.filename
-        schema = self.__load_file(path + '.schema')
-        
-        if not schema:
-            fall = self.__full_bool_prompt("", "Fall back to default schema")
-            if not fall:
-                print(red("Did not fall back to default schema. Aborting..."))
-                exit()
-
-            schema = self.__load_file('./lazyconf.json.schema')
-            if not schema:
-                print(red('Could not fall back to default schema. Aborting...'))
-                exit()
+            # If none of the above are true, it's a string.
             else:
-                print(green('Loaded default schema.'))
+                data[k] = prompt(prefix + self.data.get_label(s) + ':', default = v)
+
+
+    # Loads the schema from a schema file.
+    def configure(self, schema_file, data_file, out_file):
+
+        # Initialise the schema and data objects.
+        schema, data = Schema(), Schema()
+        
+        # Load the schema from a file.
+        try:
+            schema.load(schema_file)
+        except Exception as e:
+
+            # If we can't load the schema, abort.
+            self.prompt.error(str(e) + ". Aborting...")
+            return
         else:
-            print(green('Loaded schema.'))
+            self.prompt.success("Loaded schema from " + schema_file)
 
-        self.internal = schema['_internal']
-        del(schema['_internal'])
+        # Load the data from a file.
+        try:
+            data.load(data_file)
+        except Exception as e:
+            self.prompt.error(str(e))
 
-        self.labels = self.internal['labels']
-        self.lists = self.internal['lists']
+            # If we can't load the data, we can continue from the schema.
+            # If the data file path was entered incorrectly, we can abort.
+            cont = self.prompt.bool("Continue from schema", True)
+            if not cont:
+                self.prompt.error("Aborting...")
+                return
+        else:
+            self.prompt.success("Loaded data from " + data_file)
 
-        data = self.__load_file(path)
+        # Store the internals of the schema (labels, lists, etc.) in data.
+        data.internal = schema.internal
 
-        if data:
-            print(green("Loaded data."))
-            d = Merge(schema, data)
-            mods = d.merge()
+        # If we have data from a data file, merge the schema file into it.
+        if data.data:
+
+            # Create a new Merge instance using the data from the schema and data files.
+            m = Merge(schema.data, data.data)
+            mods = m.merge()
+
             for a in mods['added']:
                 print(green("Added " + a + " to data."))
 
@@ -162,68 +133,18 @@ class Lazyconf():
             for k,m in mods['modified']:
                 print(blue("Modified " + k + ": " + m[0] + " became " + m[1] + "." ))
 
-            self.data = data
+        # Otherwise, reference the data from the schema file verbatim.
         else:
-            self.data = schema
-            
-        self.__cfg(self.data, 'config')
-        self.save()
+            data.data = schema.data
 
-        # Set self.data to data and run configure.
-        # Save the data file.
-        pass
+        # Store the data.
+        self.data = data
 
-    def __no_configure(self):
-        # Set self.data as only what was loaded in the json file. Do not fall back on schema.
-        pass
+        # Configure the data.
+        self.configure_data(data.data).
 
-    def __load_file(self, path):
-        data = None
-        try:
-            with open(path) as handle:
-                try:
-                    data = json.load(handle)
-                except ValueError as e:
-                    print(red('Error parsing JSON: ' + str(e)))
-                    return None
-                if type(data) is not dict:
-                    print(red('Error parsing JSON from file ' + path))
-                    return None
-                handle.close()
-        except IOError as e:
-            print(red('Could not load file: ' + str(e)))
-            return None
+        # Save the data to the out file.
+        self.data.save(out_file)
 
-        return data
-
-    def save(self, d = None, f = None):
-        if not d:
-            d = self.data
-        if not f:
-            f = self.filename
-        try:
-            with open(self.project_dir + '/' + f, 'w') as handle:
-                json.dump(d, handle, indent=4)
-        except IOError as e:
-            print(red('Could not save file: ' + str(e)))
-            exit()
-        else:
-            print(green('Saved data to file: ' + f))
-
-    ### Prompt/Deprompt functions ###
-    def prompt_bool(self, p):
-        if p is True:
-            return 'y'
-        if p is False:
-            return 'n'
-        return ''
-
-    def deprompt_bool(self, p): 
-        if p == 'y':
-            return True
-        if p == 'n':
-            return False
-        return None
-
-lz = Lazyconf(os.path.dirname(__file__))
-lz.t()
+c = Lazyconf()
+c.configure('./lazyconf.json.schema', './lazyconf.json', './lazyconf.json')
