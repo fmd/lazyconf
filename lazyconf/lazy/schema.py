@@ -1,4 +1,5 @@
 import json
+from lazy.select import *
 
 ### Schema ###
 ### This class is used to load and store a dictionary from a config file.
@@ -12,25 +13,10 @@ class Schema():
         self.internal = None
 
 
-    # Gets the key from a value in a list.
-    def get_list_key(self, v, list):
-        for k,val in list.iteritems():
-            if v == val:
-                return k
-        return ""
-
-
-    # Gets the value from a key in a list.
-    def get_list_value(self, k, list):
-        if k in list.keys():
-            return list[k]
-        return ""
-
-
     # Gets a list by its dot-notated key.
-    def get_list(self, k):
+    def get_select(self, k):
         if k in self.internal['lists'].keys():
-            return self.internal['lists'][k]
+            return Select(self.internal['lists'][k])
         return None
 
 
@@ -48,9 +34,8 @@ class Schema():
         return val
 
 
-    # Gets a value from dot format: s.get('project.cache.backend') in dict format: self.data['project']['cache']['backend']
+    # Gets a value from dot format: s.get('project.cache.backend') from dict format: self.data['project']['cache']['backend']
     def get(self, key):
-
         if not self.data:
             return None
 
