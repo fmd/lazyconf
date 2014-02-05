@@ -11,7 +11,7 @@ class Lazyconf():
     def __init__(self):
         self.prompt = Prompt()
         self.data = None
-        
+
 
     # Goes through all the options in the data file, and prompts new values.
     def configure_data(self, data, key_string = ''):
@@ -20,44 +20,65 @@ class Lazyconf():
         if len(data.keys()) == 0:
             return
 
+        # Split the key string by its dots to find out how deep we are.
         key_parts = key_string.rsplit('.')
         prefix = "--" * (len(key_parts) - 1)
 
+        # Attempt to get a label for this key string.
         label = self.data.get_label(key_string)
+
+        # If we are have any key string or label, write the header for this section.
+        if label:
+            self.prompt.header(prefix + label)
+
+        # Add to the prefix to indicate options on this level.
         prefix = prefix + "-- "
 
-        if label:
-            header = self.prompt.header(label)
-
+        # If this section has an '_enabled' key, process it first, as it could enable or disable this whole section.
         if '_enabled' in data.keys():
             s = self.data.get_key_string(key_string, '_enabled')
+
+            #Prompt whether to enable this section. Use the existing value as the default.
             data['_enabled'] = self.prompt.bool(prefix + self.data.get_label(s), data['_enabled'])
+
+            # Return if this section is now disabled.
             if data['_enabled'] is False:
                 return
 
+        # Loop through the rest of the dictionary and prompt for every key. If the value is a dictionary, call this function again for the next level.
         for k, v in data.iteritems():
-            if key_string == '_internal':
-                return
 
+            # If we hit the '_enabled' key, we've already processed it (but still need it in the dictionary for saving). Ignore it.
             if k == '_enabled':
                 continue
             
+            # Get the type of the value at this key, and the dot-noted format of this key.
             t = type(v)
             s = self.data.get_key_string(key_string, k)
 
-            list = self.data.get_list(s)
-            if list:
-                choices = '(' + ','.join(list.keys()) + ')'
-                re_choices = '^(' + '|'.join(list.keys()) + ')$'.encode('string_escape');
+            # See if this key has an associated list. If so, this type is a list type.
+            select = self.data.get_select(s)
+            if select:
+                data[k] = self.prompt.select(prefix + self.data.get_label(s), select, default = v)
 
-                data[k] = self.data.get_list_value(prompt(prefix + self.data.get_label(s) + ' ' + choices + ':', default = self.data.get_list_key(v,list), validate=re_choices), list)
+            # If the value type is a dictionary, recall this function.
             elif t is dict:
                 self.configure_data(v, s)
-            elif t is str or t is unicode:
-                data[k] = prompt(prefix + self.data.get_label(s) + ':', default = v)
+
+            # If the value type is a boolean, prompt a boolean.
             elif t is bool:
                 data[k] = self.prompt.bool(prefix + self.data.get_label(s))
+
+            # TODO: Currently int and other numerical types work the same as strings.
             elif t is int:
+                data[k] = prompt(prefix + self.data.get_label(s) + ':', default = str(v))
+
+            # TODO: Currently we turn lists into empty strings.
+            elif t is list:
+                data[k] = prompt(prefix + self.data.get_label(s) + ':', default = "")
+
+            # If none of the above are true, it's a string.
+            else:
                 data[k] = prompt(prefix + self.data.get_label(s) + ':', default = v)
 
 
@@ -98,8 +119,11 @@ class Lazyconf():
 
         # If we have data from a data file, merge the schema file into it.
         if data.data:
+
+            # Create a new Merge instance using the data from the schema and data files.
             m = Merge(schema.data, data.data)
             mods = m.merge()
+
             for a in mods['added']:
                 print(green("Added " + a + " to data."))
 
@@ -113,8 +137,13 @@ class Lazyconf():
         else:
             data.data = schema.data
 
+        # Store the data.
         self.data = data
-        self.configure_data(data.data)
+
+        # Configure the data.
+        self.configure_data(data.data).
+
+        # Save the data to the out file.
         self.data.save(out_file)
 
 c = Lazyconf()
