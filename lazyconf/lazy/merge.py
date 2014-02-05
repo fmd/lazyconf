@@ -93,9 +93,15 @@ class Merge():
                         schema[i] = str(schema[i])
                         s = type(schema[i])
 
+                        # If there is already a value in the data file, don't override it.
+                        if len(data[i]) > 0:
+                            schema[i] = data[i]
+
+                    # Add this to the 'modified' list
                     m = (p + i, (str(d),str(s)))
                     mods['modified'].append(m)
-                    data[i] = schema[i]
+
+                    # Copy the value from the schema to the data. data[i] = schema[i]
 
         # Return the dictionary of modifications.
         return mods
