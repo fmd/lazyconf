@@ -37,11 +37,11 @@
             "db.pass":"Database password"
         },
         "lists": {
-            "config.db.engine": {
+            "db.engine": {
                 "postgres" : "django.db.backends.postgresql_psycopg2",
                 "mysql"    : "django.db.backends.mysql"
             },
-            "config.cache.backend": {
+            "cache.backend": {
                 "memcached" : "django.core.cache.backends.memcached.MemcachedCache"
             }
         }
