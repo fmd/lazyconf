@@ -13,6 +13,10 @@ class Prompt():
 
     ### Formatting ###
 
+    # Prints a header around a string.
+    def header(self, msg):
+        print(green("[" + msg + "]"))
+
     # Prints a success message.
     def success(self, msg):
         print(green("Success: " + msg))
