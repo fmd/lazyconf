@@ -3,7 +3,7 @@ from lazy.schema import *
 from lazy.merge import *
 
 ### Lazyconf ###
-### Our main class. These functions should all be chainable through Fabric for use on a remote server.
+### Our main class. The external functions here should be chainable through Fabric for use on a remote server.
 
 class Lazyconf():
 
@@ -29,7 +29,10 @@ class Lazyconf():
 
         # If we are have any key string or label, write the header for this section.
         if label:
-            self.prompt.header(prefix + label)
+            p = prefix
+            if len(p) > 0:
+                p += ' '
+            self.prompt.header(p + '[' + label + ']')
 
         # Add to the prefix to indicate options on this level.
         prefix = prefix + "-- "
@@ -67,13 +70,13 @@ class Lazyconf():
 
             # If the value type is a boolean, prompt a boolean.
             elif t is bool:
-                data[k] = self.prompt.bool(prefix + self.data.get_label(s))
+                data[k] = self.prompt.bool(prefix + self.data.get_label(s), default = v)
 
-            # TODO: Currently int and other numerical types work the same as strings.
+            # If the value is an int, prompt and int.
             elif t is int:
-                data[k] = prompt(prefix + self.data.get_label(s) + ':', default = str(v))
+                data[k] = self.prompt.int(prefix + self.data.get_label(s), default = v)
 
-            # TODO: Currently we turn lists into empty strings.
+            # If someone has put a list in data, we default it to an empty string. If it had come from the schema, it would already be a string.
             elif t is list:
                 data[k] = prompt(prefix + self.data.get_label(s) + ':', default = "")
 
