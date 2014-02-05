@@ -17,13 +17,16 @@ class Prompt():
     def header(self, msg):
         print(green("[" + msg + "]"))
 
+
     # Prints a success message.
     def success(self, msg):
         print(green("Success: " + msg))
 
+
     # Prints an error message.
     def error(self, msg):
         print(red("Error: " + msg))
+
 
     # Prints a notice message.
     def notice(self, msg):
@@ -45,6 +48,7 @@ class Prompt():
         if p is False:
             return 'n'
         return ''
+
 
     # Takes y|n and returns a python bool.
     def defmt_bool(self, p): 
