@@ -87,7 +87,13 @@ class Merge():
 
                 # Otherwise if the variable type has changed, copy the variable from the schema to the data.
                 elif s != d:
-                    m = (p, (str(d),str(s)))
+                    
+                    # Here, we process lists into strings.
+                    if s is list:
+                        schema[i] = str(schema[i])
+                        s = type(schema[i])
+
+                    m = (p + i, (str(d),str(s)))
                     mods['modified'].append(m)
                     data[i] = schema[i]
 
