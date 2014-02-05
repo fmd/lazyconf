@@ -13,6 +13,11 @@ class Lazyconf():
         self.data = None
         self.internal = {}
 
+
+    # Goes through all the options in the data file, and prompts new values.
+    def configure_data(self):
+        pass
+
     # Loads the schema from a schema file.
     def configure(self, schema_file, data_file, out_file):
 
@@ -67,6 +72,7 @@ class Lazyconf():
             data.data = schema.data
 
         self.data = data
+        self.configure_data()
         self.data.save(out_file)
 
 
