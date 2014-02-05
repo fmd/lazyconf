@@ -1,6 +1,7 @@
 from fabric.api import *
 from fabric.colors import green, red, blue
 
+from lazy.select import *
 ### Prompt ###
 ### This class contains several helper functions for getting data between end-user's input and a schema.Schema object.
 ### It also containers several formatting functions, which are currently just a convenience wrapper around printing Fabric colors.
@@ -36,8 +37,13 @@ class Prompt():
 
     # Returns the value from a validated bool prompt.
     def bool(self, label, default = False):
-        val = prompt(label + '? (y/n)', default = self.fmt_bool(default), validate = r'^(y|n)$')
+        val = prompt(label + ' (y/n):', default = self.fmt_bool(default), validate = r'^(y|n)$')
         return self.defmt_bool(val)
+
+    # Returns the value from a validated select prompt.
+    def select(self, label, select, default = ""):
+        return select.get_value(prompt(label + ' ' + select.choices() + ':', default = select.get_key(default), validate = select.reg_choices()))
+
 
     ### Formatting ###
 
@@ -57,5 +63,3 @@ class Prompt():
         if p == 'n':
             return False
         return None
-
-
