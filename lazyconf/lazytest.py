@@ -13,10 +13,78 @@ class Lazyconf():
         self.data = None
         self.internal = {}
 
+    def get_list_key(self, v, list):
+        for k,val in list.iteritems():
+            if v == val:
+                return k
+        return ""
+
+    def get_list_value(self, k, list):
+        if k in list.keys():
+            return list[k]
+        return ""
+
+    def get_list(self, k):
+        if k in self.internal['lists'].keys():
+            return self.internal['lists'][k]
+        return None
+
+    def get_label(self, label):
+        if label in self.internal['labels'].keys():
+            return self.internal['labels'][label]
+        return label
+
+    def get_key_string(self, key, val):
+        if key:
+            return '.'.join([key, val])
+        return val
 
     # Goes through all the options in the data file, and prompts new values.
-    def configure_data(self):
-        pass
+    def configure_data(self, data, key_string = ''):
+        
+        # If there's no keys in this dictionary, we have nothing to do.
+        if len(data.keys()) == 0:
+            return
+
+        key_parts = key_string.rsplit('.')
+        prefix = "--" * (len(key_parts) - 1)
+
+        label = self.get_label(key_string)
+        prefix = prefix + "-- "
+
+        if label:
+            header = self.prompt.header(label)
+
+        if '_enabled' in data.keys():
+            s = self.get_key_string(key_string, '_enabled')
+            data['_enabled'] = self.prompt.bool(prefix + self.get_label(s), data['_enabled'])
+            if data['_enabled'] is False:
+                return
+
+        for k, v in data.iteritems():
+            if key_string == '_internal':
+                return
+
+            if k == '_enabled':
+                continue
+            
+            t = type(v)
+            s = self.get_key_string(key_string, k)
+
+            list = self.get_list(s)
+            if list:
+                choices = '(' + ','.join(list.keys()) + ')'
+                re_choices = '^(' + '|'.join(list.keys()) + ')$'.encode('string_escape');
+
+                data[k] = self.get_list_value(prompt(prefix + self.get_label(s) + ' ' + choices + ':', default = self.get_list_key(v,list), validate=re_choices), list)
+            elif t is dict:
+                self.configure_data(v, s)
+            elif t is str or t is unicode:
+                data[k] = prompt(prefix + self.get_label(s) + ':', default = v)
+            elif t is bool:
+                data[k] = self.prompt.bool(prefix + self.get_label(s))
+            elif t is int:
+                data[k] = prompt(prefix + self.get_label(s) + ':', default = v)
 
     # Loads the schema from a schema file.
     def configure(self, schema_file, data_file, out_file):
@@ -72,9 +140,8 @@ class Lazyconf():
             data.data = schema.data
 
         self.data = data
-        self.configure_data()
+        self.configure_data(data.data)
         self.data.save(out_file)
-
 
 c = Lazyconf()
 c.configure('./lazyconf.json.schema', './lazyconf.json', './lazyconf.json')
