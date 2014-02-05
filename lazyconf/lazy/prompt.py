@@ -16,7 +16,7 @@ class Prompt():
 
     # Prints a header around a string.
     def header(self, msg):
-        print(green("[" + msg + "]"))
+        print(green(msg))
 
 
     # Prints a success message.
@@ -34,6 +34,11 @@ class Prompt():
         print(blue(msg))
 
     ### Prompts ###
+
+    # Returns the value from a validated int prompt.
+    def int(self, label, default = 0):
+        val = prompt(label + ' (int):', default = str(default), validate = r'^[0-9]+$')
+        return int(val)
 
     # Returns the value from a validated bool prompt.
     def bool(self, label, default = False):
