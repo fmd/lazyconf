@@ -14,14 +14,17 @@ class Merge():
         self.set_schema = set(self.schema.keys())
         self.set_data = set(self.data.keys())
         self.intersect = self.set_schema.intersection(self.set_data)
+        
 
     # Returns all top level keys which have been added to the schema.
     def added(self):
         return self.set_schema - self.intersect
 
+
     # Returns all top level keys which have been removed from the schema.
     def removed(self):
         return self.set_data - self.intersect
+
 
     # This method recursively merges all changes in the schema into the data file.
     def merge(self, schema = None, data = None, prefix = None):
