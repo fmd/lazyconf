@@ -20,21 +20,21 @@
 
     "_internal" : {
         "labels": {
-            "config.project": "Project Settings",
-            "config.cache": "Cache Settings",
-            "config.db": "Database Connection",
-            "config.env": "Application Environment",
+            "project": "Project Settings",
+            "cache": "Cache Settings",
+            "db": "Database Connection",
+            "env": "Application Environment",
 
-            "config.cache.backend": "Caching backend", 
-            "config.cache.location": "Caching location",
-            "config.project._enabled": "Enable project settings",
-            "config.cache._enabled": "Enable caching",
-            "config.project.dir": "Full path to project",
-            "config.env.debug": "Debug mode",
-            "config.db.engine":"Database Engine",
-            "config.db.name":"Database name (Not username!)",
-            "config.db.user":"Database username",
-            "config.db.pass":"Database password"
+            "cache.backend": "Caching backend", 
+            "cache.location": "Caching location",
+            "project._enabled": "Enable project settings",
+            "cache._enabled": "Enable caching",
+            "project.dir": "Full path to project",
+            "env.debug": "Debug mode",
+            "db.engine":"Database Engine",
+            "db.name":"Database name (Not username!)",
+            "db.user":"Database username",
+            "db.pass":"Database password"
         },
         "lists": {
             "config.db.engine": {
