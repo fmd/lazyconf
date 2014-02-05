@@ -11,33 +11,7 @@ class Lazyconf():
     def __init__(self):
         self.prompt = Prompt()
         self.data = None
-        self.internal = {}
-
-    def get_list_key(self, v, list):
-        for k,val in list.iteritems():
-            if v == val:
-                return k
-        return ""
-
-    def get_list_value(self, k, list):
-        if k in list.keys():
-            return list[k]
-        return ""
-
-    def get_list(self, k):
-        if k in self.internal['lists'].keys():
-            return self.internal['lists'][k]
-        return None
-
-    def get_label(self, label):
-        if label in self.internal['labels'].keys():
-            return self.internal['labels'][label]
-        return label
-
-    def get_key_string(self, key, val):
-        if key:
-            return '.'.join([key, val])
-        return val
+        
 
     # Goes through all the options in the data file, and prompts new values.
     def configure_data(self, data, key_string = ''):
@@ -49,15 +23,15 @@ class Lazyconf():
         key_parts = key_string.rsplit('.')
         prefix = "--" * (len(key_parts) - 1)
 
-        label = self.get_label(key_string)
+        label = self.data.get_label(key_string)
         prefix = prefix + "-- "
 
         if label:
             header = self.prompt.header(label)
 
         if '_enabled' in data.keys():
-            s = self.get_key_string(key_string, '_enabled')
-            data['_enabled'] = self.prompt.bool(prefix + self.get_label(s), data['_enabled'])
+            s = self.data.get_key_string(key_string, '_enabled')
+            data['_enabled'] = self.prompt.bool(prefix + self.data.get_label(s), data['_enabled'])
             if data['_enabled'] is False:
                 return
 
@@ -69,22 +43,23 @@ class Lazyconf():
                 continue
             
             t = type(v)
-            s = self.get_key_string(key_string, k)
+            s = self.data.get_key_string(key_string, k)
 
-            list = self.get_list(s)
+            list = self.data.get_list(s)
             if list:
                 choices = '(' + ','.join(list.keys()) + ')'
                 re_choices = '^(' + '|'.join(list.keys()) + ')$'.encode('string_escape');
 
-                data[k] = self.get_list_value(prompt(prefix + self.get_label(s) + ' ' + choices + ':', default = self.get_list_key(v,list), validate=re_choices), list)
+                data[k] = self.data.get_list_value(prompt(prefix + self.data.get_label(s) + ' ' + choices + ':', default = self.data.get_list_key(v,list), validate=re_choices), list)
             elif t is dict:
                 self.configure_data(v, s)
             elif t is str or t is unicode:
-                data[k] = prompt(prefix + self.get_label(s) + ':', default = v)
+                data[k] = prompt(prefix + self.data.get_label(s) + ':', default = v)
             elif t is bool:
-                data[k] = self.prompt.bool(prefix + self.get_label(s))
+                data[k] = self.prompt.bool(prefix + self.data.get_label(s))
             elif t is int:
-                data[k] = prompt(prefix + self.get_label(s) + ':', default = v)
+                data[k] = prompt(prefix + self.data.get_label(s) + ':', default = v)
+
 
     # Loads the schema from a schema file.
     def configure(self, schema_file, data_file, out_file):
@@ -118,9 +93,8 @@ class Lazyconf():
         else:
             self.prompt.success("Loaded data from " + data_file)
 
-        # Store the internals of the schema (labels, lists, etc.) and delete it from the dictionary for merging.
-        self.internal = schema.data['_internal']
-        del(schema.data['_internal'])
+        # Store the internals of the schema (labels, lists, etc.) in data.
+        data.internal = schema.internal
 
         # If we have data from a data file, merge the schema file into it.
         if data.data:
