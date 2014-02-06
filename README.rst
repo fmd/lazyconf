@@ -1,3 +1,5 @@
+.. image:: https://travis-ci.org/fmd/lazyconf.png?branch=master   :target: https://travis-ci.org/fmd/lazyconf
+
 ========
 lazyconf
 ========
@@ -18,4 +20,3 @@ The basic idea is that you include lazyconf in your fabfile::
 .. image:: https://d2weczhvl823v0.cloudfront.net/fmd/lazyconf/trend.png
    :alt: Bitdeli badge
    :target: https://bitdeli.com/free
-
