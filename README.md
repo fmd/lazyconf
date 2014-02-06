@@ -9,7 +9,7 @@ lazyconf is an insultingly simple tool for configuring and deploying Django 1.7+
 
 ## Usage
 
-The basic idea is that you include lazyconf in your fabfile::
+The basic idea is that you include lazyconf in your fabfile:
 
     from lazyconf import Lazyconf
 
