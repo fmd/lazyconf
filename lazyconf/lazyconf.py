@@ -94,7 +94,7 @@ class Lazyconf():
         # Load the schema from a file.
         try:
             schema.load(schema_file)
-        except Exception as e:
+        except (Exception, IOError, ValueError) as e:
 
             # If we can't load the schema, abort.
             self.prompt.error(str(e) + ". Aborting...")
@@ -105,7 +105,7 @@ class Lazyconf():
         # Load the data from a file.
         try:
             data.load(data_file)
-        except Exception as e:
+        except (Exception, IOError, ValueError) as e:
             self.prompt.error(str(e))
 
             # If we can't load the data, we can continue from the schema.
@@ -149,5 +149,17 @@ class Lazyconf():
         # Save the data to the out file.
         self.data.save(out_file)
 
-c = Lazyconf()
-c.configure('./schema/lazyconf.json.schema', './lazyconf.json', './lazyconf.json')
+
+    def get(self, key):
+        return self.data.get(key)
+
+
+    def load(self, data_file):
+
+        # Load the data from a file.
+        try:
+            self.data = Schema().load(data_file)
+        except (Exception, IOError, ValueError) as e:
+            raise e
+
+        return self

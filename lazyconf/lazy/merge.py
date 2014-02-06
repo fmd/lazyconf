@@ -93,15 +93,18 @@ class Merge():
                         schema[i] = str(schema[i])
                         s = type(schema[i])
 
-                        # If there is already a value in the data file, don't override it.
-                        if len(data[i]) > 0:
-                            schema[i] = data[i]
+                        # Only copy list data as string from schema if data has no existing value.
+                        if len(data[i]) == 0:
+                            data[i] = schema[i]
 
-                    # Add this to the 'modified' list
-                    m = (p + i, (str(d),str(s)))
-                    mods['modified'].append(m)
+                    # If we're not dealing with a list, process normally.
+                    else: 
+                        # Add this to the 'modified' list.
+                        m = (p + i, (str(d),str(s)))
+                        mods['modified'].append(m)
 
-                    # Copy the value from the schema to the data. data[i] = schema[i]
+                        # Copy the value from the schema to the data.
+                        data[i] = schema[i]
 
         # Return the dictionary of modifications.
         return mods

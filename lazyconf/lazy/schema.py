@@ -1,5 +1,4 @@
 import json
-from lazy.select import *
 
 ### Schema ###
 ### This class is used to load and store a dictionary from a config file.
@@ -32,6 +31,18 @@ class Schema():
         if key:
             return '.'.join([key, val])
         return val
+
+
+    #Converts the loaded dictionary for use with the Fabric API.
+    def convert(self, input):
+        if isinstance(input, dict):
+            return {self.convert(key): self.convert(value) for key, value in input.iteritems()}
+        elif isinstance(input, list):
+            return [self.convert(element) for element in input]
+        elif isinstance(input, unicode):
+            return input.encode('utf-8')
+        else:
+            return input
 
 
     # Gets a value from dot format: s.get('project.cache.backend') from dict format: self.data['project']['cache']['backend']
@@ -80,12 +91,13 @@ class Schema():
 
         # Store the dictionary.
         handle.close()
-        self.data = data
+        self.data = self.convert(data)
 
         if '_internal' in self.data.keys():
             self.internal = self.data['_internal']
             del(self.data['_internal'])
 
+        return self
 
     # Saves self.data to a file.
     def save(self, path):

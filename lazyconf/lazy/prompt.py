@@ -1,7 +1,6 @@
 from fabric.api import *
 from fabric.colors import green, red, blue
 
-from lazy.select import *
 ### Prompt ###
 ### This class contains several helper functions for getting data between end-user's input and a schema.Schema object.
 ### It also containers several formatting functions, which are currently just a convenience wrapper around printing Fabric colors.
