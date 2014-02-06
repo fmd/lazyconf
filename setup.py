@@ -9,9 +9,6 @@ setup(
     scripts=[],
     url='https://www.github.com/fmd/lazyconf',
     license='LICENSE.rst',
-    description='Lazy config and deployment for Django.',
-    long_description=open('README.rst').read(),
-    install_requires=[
-        "Fabric >= 1.8"
-    ],
+    description='Insultingly simple configuration for Python 2.7 applications.',
+    long_description=open('README.md').read(),
 )

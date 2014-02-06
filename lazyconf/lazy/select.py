@@ -22,9 +22,11 @@ class Select():
             return self.dict[k]
         return ""
 
+    def first_choice(self):
+        return sorted(self.dict.keys())[0]
 
     def choices(self):
-        return '(' + ','.join(self.dict.keys()) + ')'
+        return '(' + ','.join(sorted(self.dict.keys())) + ')'
 
 
     def reg_choices(self):

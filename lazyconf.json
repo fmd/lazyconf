@@ -1,0 +1,28 @@
+{
+    "project": {
+        "_enabled": false, 
+        "dir": {
+            "a": 5, 
+            "c": 7, 
+            "b": 6, 
+            "d": {
+                "e": 8
+            }
+        }
+    }, 
+    "cache": {
+        "_enabled": false, 
+        "location": "127.0.0.1:11211", 
+        "backend": "asdad"
+    }, 
+    "db": {
+        "engine": "django.db.backends.postgresql_psycopg2", 
+        "pass": "pass", 
+        "user": "user", 
+        "name": "name"
+    }, 
+    "env": {
+        "debug": 56, 
+        "cool": false
+    }
+}

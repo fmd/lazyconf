@@ -1,29 +1,17 @@
 {
-    "project": {
-        "_enabled":false,
-        "dir": {
-            "a":5,
-            "b":6,
-            "c":7,
-            "d": {
-                "e":8
-            }
-        }
-    }, 
     "cache": {
         "_enabled": false, 
         "location": "127.0.0.1:11211", 
-        "backend": "asdad"
+        "backend": ""
     }, 
     "db": {
-        "engine": "", 
-        "pass": "", 
+        "engine": "",  
         "user": "", 
-        "name": [1,2,4,4,5,6]
+        "name": "",
+        "pass": ""
     }, 
     "env": {
-        "debug": 5,
-        "cool":true
+        "debug": true
     },
 
     "_internal" : {
@@ -44,7 +32,7 @@
             "db.user":"Database username",
             "db.pass":"Database password"
         },
-        "lists": {
+        "selects": {
             "db.engine": {
                 "postgres" : "django.db.backends.postgresql_psycopg2",
                 "mysql"    : "django.db.backends.mysql"

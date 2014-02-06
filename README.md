@@ -2,10 +2,10 @@
 [![Coverage Status](https://coveralls.io/repos/fmd/lazyconf/badge.png?branch=master)](https://coveralls.io/r/fmd/lazyconf?branch=master)
 
 # lazyconf
-lazyconf is an insultingly simple tool for configuring and deploying Django 1.7+ applications. 
+lazyconf is an insultingly simple tool for configuring python applications. 
 
 ## Dependencies
-* [Fabric](http://docs.fabfile.org/en/1.8/)
+* Python 2.7
 
 ## Usage
 

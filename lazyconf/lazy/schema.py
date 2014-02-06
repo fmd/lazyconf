@@ -1,4 +1,5 @@
 import json
+from select import *
 
 ### Schema ###
 ### This class is used to load and store a dictionary from a config file.
@@ -14,8 +15,8 @@ class Schema():
 
     # Gets a list by its dot-notated key.
     def get_select(self, k):
-        if k in self.internal['lists'].keys():
-            return Select(self.internal['lists'][k])
+        if k in self.internal['selects'].keys():
+            return Select(self.internal['selects'][k])
         return None
 
 

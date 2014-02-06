@@ -88,14 +88,9 @@ class Merge():
                 # Otherwise if the variable type has changed, copy the variable from the schema to the data.
                 elif s != d:
                     
-                    # Here, we process lists into strings.
+                    # Here, we process lists into empty strings.
                     if s is list:
-                        schema[i] = str(schema[i])
-                        s = type(schema[i])
-
-                        # Only copy list data as string from schema if data has no existing value.
-                        if len(data[i]) == 0:
-                            data[i] = schema[i]
+                            data[i] = ""
 
                     # If we're not dealing with a list, process normally.
                     else: 

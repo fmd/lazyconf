@@ -3,7 +3,7 @@ from lazy.schema import *
 from lazy.merge import *
 
 ### Lazyconf ###
-### Our main class. The external functions here should be chainable through Fabric for use on a remote server.
+### Our main class. Annotate public functions better.
 
 class Lazyconf():
 
@@ -22,7 +22,7 @@ class Lazyconf():
 
         # Split the key string by its dots to find out how deep we are.
         key_parts = key_string.rsplit('.')
-        prefix = "--" * (len(key_parts) - 1)
+        prefix = '  ' * (len(key_parts) - 1)
 
         # Attempt to get a label for this key string.
         label = self.data.get_label(key_string)
@@ -35,7 +35,7 @@ class Lazyconf():
             self.prompt.header(p + '[' + label + ']')
 
         # Add to the prefix to indicate options on this level.
-        prefix = prefix + "-- "
+        prefix = prefix + "   "
 
         # If this section has an '_enabled' key, process it first, as it could enable or disable this whole section.
         if '_enabled' in data.keys():
@@ -59,7 +59,7 @@ class Lazyconf():
             t = type(v)
             s = self.data.get_key_string(key_string, k)
 
-            # See if this key has an associated list. If so, this type is a list type.
+            # See if this key has an associated select. If so, this type is a select type.
             select = self.data.get_select(s)
             if select:
                 data[k] = self.prompt.select(prefix + self.data.get_label(s), select, default = v)
@@ -78,11 +78,11 @@ class Lazyconf():
 
             # If someone has put a list in data, we default it to an empty string. If it had come from the schema, it would already be a string.
             elif t is list:
-                data[k] = prompt(prefix + self.data.get_label(s) + ':', default = "")
+                data[k] = self.prompt.string(prefix + self.data.get_label(s) + ':', default = "")
 
             # If none of the above are true, it's a string.
             else:
-                data[k] = prompt(prefix + self.data.get_label(s) + ':', default = v)
+                data[k] = self.prompt.string(prefix + self.data.get_label(s) + ':', default = v)
 
 
     # Loads the schema from a schema file.
@@ -117,7 +117,7 @@ class Lazyconf():
         else:
             self.prompt.success("Loaded data from " + data_file)
 
-        # Store the internals of the schema (labels, lists, etc.) in data.
+        # Store the internals of the schema (labels, selects, etc.) in data.
         data.internal = schema.internal
 
         # If we have data from a data file, merge the schema file into it.

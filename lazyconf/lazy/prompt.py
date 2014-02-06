@@ -1,9 +1,7 @@
-from fabric.api import *
-from fabric.colors import green, red, blue
-
+import re
+from colors import Colors
 ### Prompt ###
-### This class contains several helper functions for getting data between end-user's input and a schema.Schema object.
-### It also containers several formatting functions, which are currently just a convenience wrapper around printing Fabric colors.
+### This class contains several helper functions for getting data to and from the end-user's input and a schema.Schema object.
 
 class Prompt():
 
@@ -15,38 +13,84 @@ class Prompt():
 
     # Prints a header around a string.
     def header(self, msg):
-        print(green(msg))
+        print(Colors.header + msg + Colors.end)
 
 
     # Prints a success message.
     def success(self, msg):
-        print(green("Success: " + msg))
+        print(Colors.success + msg + Colors.end)
 
 
     # Prints an error message.
     def error(self, msg):
-        print(red("Error: " + msg))
+        print(Colors.error + msg + Colors.end)
 
 
     # Prints a notice message.
     def notice(self, msg):
-        print(blue(msg))
+        print(Colors.blue + msg + Colors.end)
+
+
+    # The prompt string method.
+    # This method heavily models how it works in Fabric.
+    def string(self, label, default='', validate=None):
+        
+        p = label + ' ' + '[%s]' % str(default).strip() + ' '
+        value = None
+        while value is None:
+
+            # Get the raw input.
+            value = raw_input(p) or default
+            if validate:
+
+                # Attempt to validate the string if it's callable.
+                if callable(validate):
+                    try:
+                        value = validate(value)
+                    except Exception, e:
+
+                        # If the regex fails, loop.
+                        value = None
+                        print("Validation failed for the following reason:")
+                        print(indent(e.message) + '\n')
+
+                # Attempt to validate it if it's not callable.
+                else:
+                    if not validate.startswith('^'):
+                        validate = r'^' + validate
+
+                    if not validate.endswith('$'):
+                        validate += r'$'
+
+                    result = re.findall(validate, value)
+                    if not result:
+                        print("Regular expression validation failed: '%s' does not match '%s'\n" % (value, validate))
+
+                        # If the regex fails, loop.
+                        value = None
+
+        return value
 
     ### Prompts ###
 
     # Returns the value from a validated int prompt.
     def int(self, label, default = 0):
-        val = prompt(label + ' (int):', default = str(default), validate = r'^[0-9]+$')
+        val = self.string(label + ' (int):', default = str(default), validate = r'^[0-9]+$')
         return int(val)
+
 
     # Returns the value from a validated bool prompt.
     def bool(self, label, default = False):
-        val = prompt(label + ' (y/n):', default = self.fmt_bool(default), validate = r'^(y|n)$')
+        val = self.string(label + ' (y/n):', default = self.fmt_bool(default), validate = r'^(y|n)$')
         return self.defmt_bool(val)
+
 
     # Returns the value from a validated select prompt.
     def select(self, label, select, default = ""):
-        return select.get_value(prompt(label + ' ' + select.choices() + ':', default = select.get_key(default), validate = select.reg_choices()))
+        deft = select.get_key(default)
+        if not deft:
+            deft = select.first_choice()
+        return select.get_value(self.string(label + ' ' + select.choices() + ':', default = deft, validate = select.reg_choices()))
 
 
     ### Formatting ###

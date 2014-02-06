@@ -1,0 +1,24 @@
+{
+    
+    /** User-defined keys go here. **/
+    "example" : "",
+
+    "_internal" : {
+        "labels" : {
+
+            /** Labels for the keys go here. **/
+            "example" : "Example Option"
+            
+        },
+
+        "selects" : {
+
+            /** Validated selects go here. **/
+            "example" : {
+                "hello" : "hello.example.ValueExample",
+                "goodbye" : "goodbye.example.ValueExample"
+            }
+
+        }
+    }
+}
