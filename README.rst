@@ -1,5 +1,6 @@
 .. image:: https://travis-ci.org/fmd/lazyconf.png?branch=master   :target: https://travis-ci.org/fmd/lazyconf
 
+.. image:: https://coveralls.io/repos/fmd/lazyconf/badge.png?branch=master  :target: https://coveralls.io/r/fmd/lazyconf?branch=master
 ========
 lazyconf
 ========
