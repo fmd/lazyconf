@@ -12,11 +12,27 @@ from lib.merge import *
 class Lazyconf():
 
     lazy_folder = '.lazy/'
+    ignore_file = '.gitignore'
 
     # Initialisation.
     def __init__(self):
         self.prompt = Prompt()
         self.data = None
+
+    # Creates the self.lazy_folder if it doesn't already exist, and writes the .gitignore.
+    def add_ignore(self, line):
+        path = self.lazy_folder + self.ignore_file
+        if os.path.isfile(os.path.realpath(path)):
+            self.prompt.notice("OKIE DOKE")
+            return
+
+        try:
+            handle = open(path,'w')
+            handle.write(line + '\n')
+        except IOError as e:
+            raise e
+
+        handle.close()
 
     # Finds all schema templates and prompts to choose one. Copies the file to self.lazy_folder.
     def choose_schema(self, out_file):
@@ -137,7 +153,6 @@ class Lazyconf():
     def configure(self):
 
         path = os.getcwd() + '/' + self.lazy_folder
-
         if not os.path.exists(path):
             os.makedirs(path)
 
@@ -201,6 +216,7 @@ class Lazyconf():
         self.data.save(out_file)
 
         sp, sf = os.path.split(out_file)
+        self.add_ignore(sf)
         self.prompt.success('Saved to ' + self.lazy_folder + sf + '.')
 
 
