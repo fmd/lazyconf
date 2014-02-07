@@ -101,7 +101,10 @@ class Schema():
         return self
 
     # Saves self.data to a file.
-    def save(self, path):
+    def save(self, path, as_schema = False):
+
+        if as_schema:
+            self.data['_internal'] = self.internal
 
         # Try and save the file to the path.
         try:
@@ -111,5 +114,7 @@ class Schema():
         # Raise an exception if we can't find the file.
         except IOError as e:
             raise e
+        finally:
+            del(self.data['_internal'])
 
         handle.close()
