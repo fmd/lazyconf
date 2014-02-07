@@ -11,12 +11,14 @@ from lib.merge import *
 
 class Lazyconf():
 
+    lazy_folder = '.lazy/'
+
     # Initialisation.
     def __init__(self):
         self.prompt = Prompt()
         self.data = None
 
-    # Finds all schema templates and prompts to choose one. Copies the file to .lazy
+    # Finds all schema templates and prompts to choose one. Copies the file to self.lazy_folder.
     def choose_schema(self, out_file):
 
         path = os.path.dirname(lazyconf.__file__) + '/schema/'
@@ -25,21 +27,20 @@ class Lazyconf():
         i = 0
         choices = []
 
-        for file in os.listdir(path):
-            if file.endswith('.json'):
+        for filename in os.listdir(path):
+            if filename.endswith('.json'):
                 try:
-                    f = self._load(path + file)
-                    d = f.get('_meta.description')
-                    
-                    desc = str(i + 1) + '. ' + file
+                    template = self._load(path + filename)
+                    description = template.get('_meta.description')
+                    prompt_string = str(i + 1) + '. ' + filename
                     i += 1
 
-                    if d:
-                        self.prompt.notice(desc + ': ' + d)
+                    if description:
+                        self.prompt.notice(prompt_string + ': ' + description)
                     else:
-                        self.prompt.notice(desc)
+                        self.prompt.notice(prompt_string)
 
-                    choices.append(f)
+                    choices.append(template)
 
                 except IOError as e:
                     print self.prompt.error(str(e))
@@ -55,7 +56,9 @@ class Lazyconf():
         if '_meta' in schema.data.keys():
             del(schema.data['_meta'])
         
-        schema.save(out_file)
+        schema.save(out_file, as_schema=True)
+        sp, sf = os.path.split(out_file)
+        self.prompt.success('Saved to ' + self.lazy_folder + sf + '.')
         return schema
         
     # Goes through all the options in the data file, and prompts new values.
@@ -80,7 +83,7 @@ class Lazyconf():
             self.prompt.header(p + '[' + label + ']')
 
         # Add to the prefix to indicate options on this level.
-        prefix = prefix + "   "
+        prefix = prefix + '   '
 
         # If this section has an '_enabled' key, process it first, as it could enable or disable this whole section.
         if '_enabled' in data.keys():
@@ -123,7 +126,7 @@ class Lazyconf():
 
             # If someone has put a list in data, we default it to an empty string. If it had come from the schema, it would already be a string.
             elif t is list:
-                data[k] = self.prompt.string(prefix + self.data.get_label(s) + ':', default = "")
+                data[k] = self.prompt.string(prefix + self.data.get_label(s) + ':', default = '')
 
             # If none of the above are true, it's a string.
             else:
@@ -133,7 +136,7 @@ class Lazyconf():
     # Loads the schema from a schema file.
     def configure(self):
 
-        path = os.getcwd() + '/.lazy/'
+        path = os.getcwd() + '/' + self.lazy_folder
 
         if not os.path.exists(path):
             os.makedirs(path)
@@ -153,15 +156,17 @@ class Lazyconf():
             # If we can't load the schema, choose from templates.
             schema = self.choose_schema(schema_file)
         else:
-            self.prompt.success("Loaded schema from " + schema_file)
+            sp, sf = os.path.split(schema_file)
+            self.prompt.success('Loaded schema from ' + self.lazy_folder + sf)
 
         # Load the data from a file.
         try:
             data.load(data_file)
         except (Exception, IOError, ValueError) as e:
-            self.prompt.error("Could not find data file. Copying from schema...")
+            self.prompt.error('Could not find data file. Copying from schema...')
         else:
-            self.prompt.success("Loaded data from " + data_file)
+            sp, sf = os.path.split(data_file)
+            self.prompt.success('Loaded data from ' + self.lazy_folder + sf)
 
         # Store the internals of the schema (labels, selects, etc.) in data.
         data.internal = schema.internal
@@ -174,13 +179,13 @@ class Lazyconf():
             mods = m.merge()
 
             for a in mods['added']:
-                print(green("Added " + a + " to data."))
+                print(green('Added ' + a + ' to data.'))
 
             for r in mods['removed']:
-                print(red("Removed " + r + " from data."))
+                print(red('Removed ' + r + ' from data.'))
 
             for k,m in mods['modified']:
-                print(blue("Modified " + k + ": " + m[0] + " became " + m[1] + "." ))
+                print(blue('Modified ' + k + ': ' + m[0] + ' became ' + m[1] + '.' ))
 
         # Otherwise, reference the data from the schema file verbatim.
         else:
@@ -194,6 +199,9 @@ class Lazyconf():
 
         # Save the data to the out file.
         self.data.save(out_file)
+
+        sp, sf = os.path.split(out_file)
+        self.prompt.success('Saved to ' + self.lazy_folder + sf + '.')
 
 
     # Get the data for a dot-notated key.
