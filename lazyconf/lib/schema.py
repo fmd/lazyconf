@@ -115,6 +115,7 @@ class Schema():
         except IOError as e:
             raise e
         finally:
-            del(self.data['_internal'])
+            if '_internal' in self.data.keys():
+                del(self.data['_internal'])
 
         handle.close()
