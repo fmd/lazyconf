@@ -1,3 +1,6 @@
+import os
+import lazyconf
+
 from lib.schema import *
 from lib.prompt import *
 from lib.select import *
@@ -13,7 +16,48 @@ class Lazyconf():
         self.prompt = Prompt()
         self.data = None
 
+    # Finds all schema templates and prompts to choose one. Copies the file to .lazy
+    def choose_schema(self, out_file):
 
+        path = os.path.dirname(lazyconf.__file__) + '/schema/'
+        self.prompt.header('Choose a template for your config file: ')
+
+        i = 0
+        choices = []
+
+        for file in os.listdir(path):
+            if file.endswith('.json'):
+                try:
+                    f = self._load(path + file)
+                    d = f.get('_meta.description')
+                    
+                    desc = str(i + 1) + '. ' + file
+                    i += 1
+
+                    if d:
+                        self.prompt.notice(desc + ': ' + d)
+                    else:
+                        self.prompt.notice(desc)
+
+                    choices.append(f)
+
+                except IOError as e:
+                    print self.prompt.error(str(e))
+
+        val = 0
+        while val is 0 or val > i:
+            val = self.prompt.int('Choice', default = 1)
+            if val is 0 or val > i:
+                self.prompt.error('Please choose a value between 1 and ' + str(i) + '.')
+        
+        schema = choices[val-1]
+        
+        if '_meta' in schema.data.keys():
+            del(schema.data['_meta'])
+        
+        schema.save(out_file)
+        return schema
+        
     # Goes through all the options in the data file, and prompts new values.
     def configure_data(self, data, key_string = ''):
         
@@ -87,7 +131,16 @@ class Lazyconf():
 
 
     # Loads the schema from a schema file.
-    def configure(self, schema_file, data_file, out_file):
+    def configure(self):
+
+        path = os.getcwd() + '/.lazy/'
+
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        schema_file = path + 'lazy.schema.json'
+        data_file = path + 'lazy.json'
+        out_file = data_file
 
         # Initialise the schema and data objects.
         schema, data = Schema(), Schema()
@@ -97,9 +150,8 @@ class Lazyconf():
             schema.load(schema_file)
         except (Exception, IOError, ValueError) as e:
 
-            # If we can't load the schema, abort.
-            self.prompt.error(str(e) + ". Aborting...")
-            return
+            # If we can't load the schema, choose from templates.
+            schema = self.choose_schema(schema_file)
         else:
             self.prompt.success("Loaded schema from " + schema_file)
 
@@ -107,14 +159,7 @@ class Lazyconf():
         try:
             data.load(data_file)
         except (Exception, IOError, ValueError) as e:
-            self.prompt.error(str(e))
-
-            # If we can't load the data, we can continue from the schema.
-            # If the data file path was entered incorrectly, we can abort.
-            cont = self.prompt.bool("Continue from schema", True)
-            if not cont:
-                self.prompt.error("Aborting...")
-                return
+            self.prompt.error("Could not find data file. Copying from schema...")
         else:
             self.prompt.success("Loaded data from " + data_file)
 
@@ -156,12 +201,16 @@ class Lazyconf():
         return self.data.get(key)
 
 
-    def load(self, data_file):
+    def _load(self, data_file):
 
-        # Load the data from a file.
+       # Load the data from a file.
         try:
-            self.data = Schema().load(data_file)
+            data = Schema().load(data_file)
         except (Exception, IOError, ValueError) as e:
             raise e
 
+        return data
+
+    def load(self, data_file):
+        self.data = self._load(data_file)
         return self
