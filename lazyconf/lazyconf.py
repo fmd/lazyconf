@@ -1,6 +1,7 @@
-from lazy.prompt import *
-from lazy.schema import *
-from lazy.merge import *
+from lib.schema import *
+from lib.prompt import *
+from lib.select import *
+from lib.merge import *
 
 ### Lazyconf ###
 ### Our main class. Annotate public functions better.
@@ -150,6 +151,7 @@ class Lazyconf():
         self.data.save(out_file)
 
 
+    # Get the data for a dot-notated key.
     def get(self, key):
         return self.data.get(key)
 

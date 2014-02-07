@@ -1,3 +1,4 @@
 dist/
 lazyconf.egg-info/
 .coverage
+build/
