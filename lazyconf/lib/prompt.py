@@ -51,8 +51,8 @@ class Prompt():
 
                         # If the regex fails, loop.
                         value = None
-                        print("Validation failed for the following reason:")
-                        print(indent(e.message) + '\n')
+                        self.error("Validation failed for the following reason:")
+                        self.error(indent(e.message) + '\n')
 
                 # Attempt to validate it if it's not callable.
                 else:
@@ -64,7 +64,7 @@ class Prompt():
 
                     result = re.findall(validate, value)
                     if not result:
-                        print("Regular expression validation failed: '%s' does not match '%s'\n" % (value, validate))
+                        self.error("Regular expression validation failed: '%s' does not match '%s'\n" % (value, validate))
 
                         # If the regex fails, loop.
                         value = None
