@@ -1,8 +1,3 @@
-import argparse
+from lazyconf import *
 
-parser = argparse.ArgumentParser(description='Simple configuration for Python applications.')
-parser.add_argument('-s', type=str, nargs='+',
-                   help='The schema file to configure.')
-
-args = parser.parse_args()
-print args
+l = Lazyconf().configure()
