@@ -13,6 +13,11 @@
     "env": {
         "debug": true
     },
+    "logging": {
+        "logfile": "whatever",
+        "log_level": 4,
+        "_enabled": false
+    },
 
     "_internal" : {
         "labels": {
@@ -20,6 +25,9 @@
             "cache": "Cache Settings",
             "db": "Database Connection",
             "env": "Application Environment",
+            "logging": "Logger settings",
+            "logging.log_level": "Logging verbosity level",
+            "logging._enabled": "Enable logging",
 
             "cache.backend": "Caching backend", 
             "cache.location": "Caching location",
