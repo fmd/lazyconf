@@ -2,3 +2,4 @@ dist/
 lazyconf.egg-info/
 .coverage
 build/
+lazyconf.json
