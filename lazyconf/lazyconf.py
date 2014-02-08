@@ -18,6 +18,7 @@ class Lazyconf():
     def __init__(self):
         self.prompt = Prompt()
         self.data = None
+    
 
     # Creates the self.lazy_folder if it doesn't already exist, and writes the .gitignore.
     def add_ignore(self, line):
@@ -33,6 +34,7 @@ class Lazyconf():
             raise e
 
         handle.close()
+
 
     # Finds all schema templates and prompts to choose one. Copies the file to self.lazy_folder.
     def choose_schema(self, out_file):
@@ -76,7 +78,8 @@ class Lazyconf():
         sp, sf = os.path.split(out_file)
         self.prompt.success('Saved to ' + self.lazy_folder + sf + '.')
         return schema
-        
+
+
     # Goes through all the options in the data file, and prompts new values.
     def configure_data(self, data, key_string = ''):
         

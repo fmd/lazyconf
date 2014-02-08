@@ -6,12 +6,13 @@ t = s + 'test/'
 
 setup(
     name='lazyconf',
-    version='0.2.8',
+    version='0.3.5',
     author='Fareed Dudhia',
     author_email='fareeddudhia@gmail.com',
-    scripts=[l + 'test.py'],
     package_dir={'' : 'lazyconf'},
     packages=['lib'],
+    entry_points={
+        'console_scripts': ['lazyconf = console:conf',]},
     data_files=[(t, [t + 'invalid.json',t + 'valid.json', t + 'noobject.json']),
                 (s, [s +'django.json', s + 'empty.json'])],
     url='https://www.github.com/fmd/lazyconf',

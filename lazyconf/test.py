@@ -7,13 +7,6 @@ from lib.prompt import *
 from lib.select import *
 from lib.merge import *
 
-# Call a configuration from this file.
-def conf():
-    p = os.path.dirname(lazyconf.__file__)
-    if not p:
-        raise Exception("Could not find local path.")
-    l = Lazyconf().configure(p  + '/schema/django.json', p + '/django.json', p + '/django.json')
-
 class LazyTests(unittest.TestCase): 
 
     # Individually test the Merge class.
