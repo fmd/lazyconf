@@ -1,3 +1,0 @@
-from lazyconf import *
-
-l = Lazyconf().configure()
