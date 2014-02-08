@@ -13,6 +13,8 @@ class Lazyconf():
 
     lazy_folder = '.lazy/'
     ignore_file = '.gitignore'
+    schema_filename = 'lazy.schema.json'
+    data_filename = 'lazy.json'
 
     # Initialisation.
     def __init__(self):
@@ -159,8 +161,8 @@ class Lazyconf():
         if not os.path.exists(path):
             os.makedirs(path)
 
-        schema_file = path + 'lazy.schema.json'
-        data_file = path + 'lazy.json'
+        schema_file = path + self.schema_filename
+        data_file = path + self.data_filename
         out_file = data_file
 
         # Initialise the schema and data objects.
@@ -238,6 +240,17 @@ class Lazyconf():
 
         return data
 
-    def load(self, data_file):
+    # Takes a folder and loads the data from .lazy/ in that folder.
+    def load(self, data_file = None):
+        if not data_file:
+            data_file = ''
+        elif data_file[-1] != '/':
+            data_file += '/'
+
+        if data_file[-6:] != self.lazy_folder:
+            data_file += self.lazy_folder
+        
+        data_file += self.data_filename
+
         self.data = self._load(data_file)
         return self

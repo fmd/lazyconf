@@ -1,22 +1,23 @@
-from setuptools import setup
+import sys
+from setuptools import setup, find_packages
+import lazyconf
 
 l = 'lazyconf/'
-s = l + 'schema/'
-t = s + 'test/'
+s = 'schema/'
 
 setup(
     name='lazyconf',
-    version='0.3.5',
+    version='0.4.2',
     author='Fareed Dudhia',
     author_email='fareeddudhia@gmail.com',
-    package_dir={'' : 'lazyconf'},
-    packages=['lib'],
+    packages=find_packages(),
+    package_data={"lazyconf": ['schema/' 'lazyconf/schema/*.json',]},
+    include_package_data=True,
+    py_modules=['lazyconf.lazyconf','lazyconf.console'],
     entry_points={
-        'console_scripts': ['lazyconf = console:conf',]},
-    data_files=[(t, [t + 'invalid.json',t + 'valid.json', t + 'noobject.json']),
-                (s, [s +'django.json', s + 'empty.json'])],
+        'console_scripts': ['lazyconf = lazyconf.console:console',]},
     url='https://www.github.com/fmd/lazyconf',
     license='LICENSE.rst',
     description='Insultingly simple configuration for Python 2.7 applications.',
-    long_description=open('README.md').read(),
+    long_description=open('README.rst').read(),
 )

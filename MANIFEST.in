@@ -1,2 +1,3 @@
 include *.txt
+recursive-include lazyconf *.json
 recursive-include docs *.txt
