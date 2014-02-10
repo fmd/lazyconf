@@ -199,13 +199,13 @@ class Lazyconf():
             mods = m.merge()
 
             for a in mods['added']:
-                print(green('Added ' + a + ' to data.'))
+                self.prompt.success('Added ' + a + ' to data.')
 
             for r in mods['removed']:
-                print(red('Removed ' + r + ' from data.'))
+                self.prompt.error('Removed ' + r + ' from data.')
 
             for k,m in mods['modified']:
-                print(blue('Modified ' + k + ': ' + m[0] + ' became ' + m[1] + '.' ))
+                self.prompt.notice('Modified ' + k + ': ' + m[0] + ' became ' + m[1] + '.' )
 
         # Otherwise, reference the data from the schema file verbatim.
         else:
