@@ -26,7 +26,6 @@ class Lazyconf():
     def add_ignore(self, line):
         path = self.lazy_folder + self.ignore_file
         if os.path.isfile(os.path.realpath(path)):
-            self.prompt.notice("OKIE DOKE")
             return
 
         try:
