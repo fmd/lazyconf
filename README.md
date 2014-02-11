@@ -1,7 +1,4 @@
-[![Build Status](https://travis-ci.org/fmd/lazyconf.png?branch=master)](https://travis-ci.org/fmd/lazyconf)
-[![Coverage Status](https://coveralls.io/repos/fmd/lazyconf/badge.png?branch=master)](https://coveralls.io/r/fmd/lazyconf?branch=master)
-[![PyPi version](https://pypip.in/v/lazyconf/badge.png)](https://crate.io/packages/lazyconf/)
-[![PyPi downloads](https://pypip.in/d/lazyconf/badge.png)](https://crate.io/packages/lazyconf/)
+
 
 # lazyconf
 lazyconf is an insultingly simple tool for configuring python applications. 
