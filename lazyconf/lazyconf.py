@@ -170,10 +170,14 @@ class Lazyconf():
         # Load the schema from a file.
         try:
             schema.load(schema_file)
-        except (Exception, IOError, ValueError) as e:
+        except IOError as e:
 
             # If we can't load the schema, choose from templates.
+            self.prompt.error("Could not find schema in " + schemafile + " - Choosing from default templates...")
             schema = self.choose_schema(schema_file)
+        except (Exception, ValueError) as e:
+            self.prompt.error("Error: " + str(e) + " - Aborting...")
+            return False
         else:
             sp, sf = os.path.split(schema_file)
             self.prompt.success('Loaded schema from ' + self.lazy_folder + sf)
