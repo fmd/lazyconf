@@ -173,7 +173,7 @@ class Lazyconf():
         except IOError as e:
 
             # If we can't load the schema, choose from templates.
-            self.prompt.error("Could not find schema in " + schemafile + " - Choosing from default templates...")
+            self.prompt.error("Could not find schema in " + schema_file + " - Choosing from default templates...")
             schema = self.choose_schema(schema_file)
         except (Exception, ValueError) as e:
             self.prompt.error("Error: " + str(e) + " - Aborting...")
