@@ -1,7 +1,5 @@
 import re
 from colors import Colors
-### Prompt ###
-### This class contains several helper functions for getting data to and from the end-user's input and a schema.Schema object.
 
 class Prompt():
 
