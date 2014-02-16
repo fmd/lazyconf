@@ -49,10 +49,12 @@ class Lazyconf():
         except IOError as e:
             raise e
 
+        # Close the handle and return.
         handle.close()
+        return None
 
-    # Finds all schema templates and prompts to choose one. Copies the file to self.lazy_folder.
     def choose_schema(self, out_file):
+        """ Finds all schema templates and prompts to choose one. Copies the file to self.lazy_folder. """
 
         path = os.path.dirname(lazyconf.__file__) + '/schema/'
         self.prompt.header('Choose a template for your config file: ')
@@ -94,10 +96,15 @@ class Lazyconf():
         self.prompt.success('Saved to ' + self.lazy_folder + sf + '.')
         return schema
 
-
-    # Goes through all the options in the data file, and prompts new values.
     def configure_data(self, data, key_string = ''):
-        
+        """ Goes through all the options in `data`, and prompts new values.
+            This function calls itself recursively if it finds an inner dictionary.
+
+            Arguments:
+            data -- The dictionary to loop through. 
+            key_string -- The dot-notated key of the dictionary being checked through.
+        """
+
         # If there's no keys in this dictionary, we have nothing to do.
         if len(data.keys()) == 0:
             return
@@ -144,41 +151,17 @@ class Lazyconf():
             # If the value type is a dictionary, call this function.
             if t is dict:
                 self.configure_data(v, s)
+
+            # Otherwise, parse the value.
             else:
-                self.parse_value(data, prefix, k, s, None, v)
+                label = prefix + self.data.get_label(s)
+                self.parse_value(data, label, s, None, v)
 
-
-    def parse_value(self, inner_dict, prefix, key, full_key, value, default):
-        t = type(default)
-
-        if t is dict:
-            return
-    
-        select = self.data.get_select(full_key)
-
-        if select:
-            inner_dict[key] = self.prompt.select(prefix + self.data.get_label(full_key), select, value, default = default)
-
-        # If the value type is a boolean, prompt a boolean.
-        elif t is bool:
-            inner_dict[key] = self.prompt.bool(prefix + self.data.get_label(full_key), value, default = default)
-
-        # If the value is an int, prompt and int.
-        elif t is int:
-            inner_dict[key] = self.prompt.int(prefix + self.data.get_label(full_key), value, default = default)
-
-        # If someone has put a list in data, we default it to an empty string. If it had come from the schema, it would already be a string.
-        elif t is list:
-            inner_dict[key] = self.prompt.prompt(prefix + self.data.get_label(full_key) + ':', value, default = '')
-
-        # If none of the above are true, it's a string.
-        else:
-            inner_dict[key] = self.prompt.prompt(prefix + self.data.get_label(full_key) + ':', value, default = default)
-
-
-    # Loads the schema from a schema file.
     def configure(self):
+        """ The main configure function. Uses a schema file and an optional data file,
+            and combines them with user prompts to write a new data file. """
 
+        # Make the lazy folder if it doesn't already exist.
         path = os.getcwd() + '/' + self.lazy_folder
         if not os.path.exists(path):
             os.makedirs(path)
@@ -249,8 +232,50 @@ class Lazyconf():
         self.add_ignore(sf)
         self.prompt.success('Saved to ' + self.lazy_folder + sf + '.')
 
+    def parse_value(self, inner_dict, label, key, value, default):
+        """ Parses a single value and sets it in an inner dictionary.
+
+            Arguments:
+            inner_dict -- The dictionary containing the value to set
+            label      -- The label to show for the prompt.
+            key        -- The key in the dictionary to set the value for.
+            value      -- The value to set. If there is a value, don't prompt for one.
+            default    -- The default value in the prompt. This is taken from the schema and defines the type of the value.
+        """
+        t = type(default)
+
+        if t is dict:
+            return
+    
+        select = self.data.get_select(key)
+        k = key.split('.')[-1]
+
+        if select:
+            inner_dict[k] = self.prompt.select(label, select, value, default = default)
+
+        # If the value type is a boolean, prompt a boolean.
+        elif t is bool:
+            inner_dict[k] = self.prompt.bool(label, value, default = default)
+
+        # If the value is an int, prompt and int.
+        elif t is int:
+            inner_dict[k] = self.prompt.int(label, value, default = default)
+
+        # If someone has put a list in data, we default it to an empty string. If it had come from the schema, it would already be a string.
+        elif t is list:
+            inner_dict[k] = self.prompt.prompt(label + ':', value, default = '')
+
+        # If none of the above are true, it's a string.
+        else:
+            inner_dict[k] = self.prompt.prompt(label + ':', value, default = default)
 
     def set(self, key, value):
+        """ Sets a single value in a preconfigured data file.
+
+            Arguments:
+            key -- The full dot-notated key to set the value for.
+            value -- The value to set.
+        """
         d = self.data.data
         keys = key.split('.')
         latest = keys.pop()
@@ -260,15 +285,24 @@ class Lazyconf():
         schema = Schema().load(self.schema_file)
 
         self.data.internal = schema.internal
-
-        self.parse_value(d, '', latest, key, value, schema.get(key))
+        self.parse_value(d, '', key, value, schema.get(key))
         self.data.save(self.data_file)
 
     # Get the data for a dot-notated key.
     def get(self, key):
+        """ Gets a single value from a preconfigured data file.
+
+            Arguments:
+            key -- The full dot-notated key to get the value from.
+        """
         return self.data.get(key)
 
     def _load(self, data_file):
+        """ Internal load function. Creates the object and returns it.
+
+            Arguments:
+            data_file -- The filename to load.
+        """
 
        # Load the data from a file.
         try:
@@ -280,6 +314,12 @@ class Lazyconf():
 
     # Takes a folder and loads the data from .lazy/ in that folder.
     def load(self, data_file = None):
+        """ Loads a data file and sets it to self.data.
+
+            Arguments:
+            data_file -- The filename to load.
+        """
+
         if not data_file:
             data_file = ''
         elif data_file[-1] != '/':
