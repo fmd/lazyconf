@@ -9,6 +9,10 @@ lazyconf is an insultingly simple tool for configuring python applications.
 ## Dependencies
 * Python 2.7
 
+## Installation
+
+    pip install lazyconf
+
 ## Usage
 
 The basic idea is that you run `lazyconf config` in your **base** directory:
