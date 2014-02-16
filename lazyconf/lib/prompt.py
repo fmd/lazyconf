@@ -41,7 +41,7 @@ class Prompt():
                     # If the regex fails, loop.
                     value = None
                     self.error("Validation failed for the following reason:")
-                    self.error(indent(e.message) + '\n')
+                    self.error(e.message + '\n')
 
             # Attempt to validate it if it's not callable.
             else:
