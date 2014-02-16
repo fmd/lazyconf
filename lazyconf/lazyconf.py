@@ -131,7 +131,7 @@ class Lazyconf():
             s = self.data.get_key_string(key_string, '_enabled')
 
             #Prompt whether to enable this section. Use the existing value as the default.
-            data['_enabled'] = self.prompt.bool(prefix + self.data.get_label(s), data['_enabled'])
+            data['_enabled'] = self.prompt.bool(prefix + self.data.get_label(s), None, data['_enabled'])
 
             # Return if this section is now disabled.
             if data['_enabled'] is False:
