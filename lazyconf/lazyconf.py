@@ -256,7 +256,6 @@ class Lazyconf():
 
         # If the value type is a boolean, prompt a boolean.
         elif t is bool:
-            print 'as'
             inner_dict[k] = self.prompt.bool(label, value, default = default)
 
         # If the value is an int, prompt and int.
