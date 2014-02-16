@@ -6,6 +6,9 @@ from lib.prompt import *
 from lib.select import *
 from lib.merge import *
 
+we need to somehow load the schema selects so that we can parse inputted data in 'set'.
+
+
 ### Lazyconf ###
 ### Our main class. Annotate public functions better.
 
@@ -137,31 +140,39 @@ class Lazyconf():
             t = type(v)
             s = self.data.get_key_string(key_string, k)
 
-            # See if this key has an associated select. If so, this type is a select type.
-            select = self.data.get_select(s)
-            if select:
-                data[k] = self.prompt.select(prefix + self.data.get_label(s), select, default = v)
-
-            # If the value type is a dictionary, recall this function.
-            elif t is dict:
+            # If the value type is a dictionary, call this function.
+            if t is dict:
                 self.configure_data(v, s)
-
-            # If the value type is a boolean, prompt a boolean.
-            elif t is bool:
-                data[k] = self.prompt.bool(prefix + self.data.get_label(s), default = v)
-
-            # If the value is an int, prompt and int.
-            elif t is int:
-                data[k] = self.prompt.int(prefix + self.data.get_label(s), default = v)
-
-            # If someone has put a list in data, we default it to an empty string. If it had come from the schema, it would already be a string.
-            elif t is list:
-                data[k] = self.prompt.string(prefix + self.data.get_label(s) + ':', default = '')
-
-            # If none of the above are true, it's a string.
             else:
-                data[k] = self.prompt.string(prefix + self.data.get_label(s) + ':', default = v)
+                self.parse_value(data, k, s, None, v)
 
+
+    def parse_value(self, inner_dict, key, full_key, value, default):
+        t = type(value)
+
+        if t is dict:
+            return
+    
+        select = self.data.get_select(full_key)
+    
+        if select:
+            data[key] = self.prompt.select(prefix + self.data.get_label(full_key), select, value, default = default)
+
+        # If the value type is a boolean, prompt a boolean.
+        elif t is bool:
+            data[key] = self.prompt.bool(prefix + self.data.get_label(full_key), value, default = default)
+
+        # If the value is an int, prompt and int.
+        elif t is int:
+            data[key] = self.prompt.int(prefix + self.data.get_label(full_key), value, default = default)
+
+        # If someone has put a list in data, we default it to an empty string. If it had come from the schema, it would already be a string.
+        elif t is list:
+            data[key] = self.prompt.prompt(prefix + self.data.get_label(full_key) + ':', value, default = '')
+
+        # If none of the above are true, it's a string.
+        else:
+            data[key] = self.prompt.prompt(prefix + self.data.get_label(full_key) + ':', value, default = default)
 
 
     # Loads the schema from a schema file.
@@ -238,9 +249,17 @@ class Lazyconf():
         self.prompt.success('Saved to ' + self.lazy_folder + sf + '.')
 
 
-
     def set(self, key, value):
-        self.data.set(key, value)
+        d = self.data.data
+        keys = key.split('.')
+        latest = keys.pop()
+        for k in keys:
+            d = d.setdefault(k, {})
+
+        schema = Schema().load(self.schema_file)
+        self.data.internal = schema.internal
+        
+        self.parse_value(d, latest, key, value, None)
 
     def parse(self):
         self.configure_data(self.data)
