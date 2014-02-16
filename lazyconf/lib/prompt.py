@@ -32,31 +32,31 @@ class Prompt():
 
 
     def validate_prompt(self, value, validate):
+        if validate:
+            if callable(validate):
+                try:
+                    value = validate(value)
+                except Exception, e:
 
-        if callable(validate):
-            try:
-                value = validate(value)
-            except Exception, e:
+                    # If the regex fails, loop.
+                    value = None
+                    self.error("Validation failed for the following reason:")
+                    self.error(indent(e.message) + '\n')
 
-                # If the regex fails, loop.
-                value = None
-                self.error("Validation failed for the following reason:")
-                self.error(indent(e.message) + '\n')
+            # Attempt to validate it if it's not callable.
+            else:
+                if not validate.startswith('^'):
+                    validate = r'^' + validate
 
-        # Attempt to validate it if it's not callable.
-        else:
-            if not validate.startswith('^'):
-                validate = r'^' + validate
+                if not validate.endswith('$'):
+                    validate += r'$'
 
-            if not validate.endswith('$'):
-                validate += r'$'
+                result = re.findall(validate, value)
+                if not result:
+                    self.error("Regular expression validation failed: '%s' does not match '%s'\n" % (value, validate))
 
-            result = re.findall(validate, value)
-            if not result:
-                self.error("Regular expression validation failed: '%s' does not match '%s'\n" % (value, validate))
-
-                # If the regex fails, loop.
-                value = None
+                    # If the regex fails, loop.
+                    value = None
 
         return value
 
@@ -68,7 +68,8 @@ class Prompt():
         prompt_string = None
 
         if not value:
-            while prompt_string is None:
+            value = None
+            while value is None:
                 prompt_string = raw_input(p) or default
                 value = self.validate_prompt(prompt_string, validate)
         else:
@@ -95,8 +96,8 @@ class Prompt():
         dflt = select.get_key(default)
         if not dflt:
             dflt = select.first_choice()
-        return select.get_value(self.prompt(label + ' ' + select.choices() + ':', value=value, default = dflt, validate = select.reg_choices()))
 
+        return select.get_value(self.prompt(label + ' ' + select.choices() + ':', value = value, default = dflt, validate = select.reg_choices()))
 
     ### Formatting ###
 
