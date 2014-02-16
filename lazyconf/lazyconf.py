@@ -16,6 +16,16 @@ class Lazyconf():
     schema_filename = 'lazy.schema.json'
     data_filename = 'lazy.json'
 
+    @property
+    def data_file(self):
+        path = os.getcwd() + '/' + self.lazy_folder
+        return self.path + self.data_filename
+
+    @property
+    def schema_file(self):
+        path = os.getcwd() + '/' + self.lazy_folder
+        return self.path + self.schema_filename
+
     # Initialisation.
     def __init__(self):
         self.prompt = Prompt()
@@ -153,6 +163,7 @@ class Lazyconf():
                 data[k] = self.prompt.string(prefix + self.data.get_label(s) + ':', default = v)
 
 
+
     # Loads the schema from a schema file.
     def configure(self):
 
@@ -160,9 +171,8 @@ class Lazyconf():
         if not os.path.exists(path):
             os.makedirs(path)
 
-        schema_file = path + self.schema_filename
-        data_file = path + self.data_filename
-        out_file = data_file
+        schema_file = self.schema_file
+        data_file = self.data_file
 
         # Initialise the schema and data objects.
         schema, data = Schema(), Schema()
@@ -221,31 +231,24 @@ class Lazyconf():
         self.configure_data(data.data)
 
         # Save the data to the out file.
-        self.data.save(out_file)
+        self.data.save(self.data_file)
 
-        sp, sf = os.path.split(out_file)
+        sp, sf = os.path.split(self.data_file)
         self.add_ignore(sf)
         self.prompt.success('Saved to ' + self.lazy_folder + sf + '.')
 
-    
+
 
     def set(self, key, value):
-        path = os.getcwd() + '/' + self.lazy_folder
-        if not os.path.exists(path):
-            os.makedirs(path)
-
-        schema_file = path + self.schema_filename
-        data_file = path + self.data_filename
-        out_file = data_file
-
         self.data.set(key, value)
-        self.data.save(out_file)
 
+    def parse(self):
+        self.configure_data(self.data)
+        self.save(self.data_file)
 
     # Get the data for a dot-notated key.
     def get(self, key):
         return self.data.get(key)
-
 
     def _load(self, data_file):
 
