@@ -1,6 +1,8 @@
 import re
 from colors import Colors
 
+""" Prompt contains all the methods for parsing and returning input. """
+
 class Prompt():
 
     # Initialisation
