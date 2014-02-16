@@ -30,7 +30,7 @@
             "db.user": "Database username", 
             "env": "Application Environment", 
             "cache._enabled": "Enable caching", 
-            "env.debug": "Debug mode",
+            "env.debug": "Debug mode"
         }, 
         "selects": {
             "cache.backend": {
