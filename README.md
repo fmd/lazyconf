@@ -116,5 +116,15 @@ To make a section optional, include a key/value pair inside the section with the
 ### Keywords
 `"_internal"` and `"_enabled"` are keywords and should not be used as option names.
 
+## Contributing
+
+Lazyconf is very much in its infancy at the moment, so I'd appreciate any bugs/issues, questions, comments, feedback or pull requests. Simply clone the repository and install the requirements:
+
+    pip install -r requirements.txt
+
+To run the (albeit currently rather weak) test suite, run
+
+    coverage run --source=lazyconf,lib lazyconf/test.py
+
 
 [![Bitdeli badge](https://d2weczhvl823v0.cloudfront.net/fmd/lazyconf/trend.png)]()
