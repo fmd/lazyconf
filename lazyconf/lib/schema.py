@@ -45,6 +45,14 @@ class Schema():
         else:
             return input
 
+    # Sets a value from dot format: s.set('project.cache.backend') from dict format: self.data['project']['cache']['backend']
+    def set(self, key, value):
+        dd = self.data
+        keys = key.split('.')
+        latest = keys.pop()
+        for k in keys:
+            dd = dd.setdefault(k, {})
+        dd[latest] = value
 
     # Gets a value from dot format: s.get('project.cache.backend') from dict format: self.data['project']['cache']['backend']
     def get(self, key):
