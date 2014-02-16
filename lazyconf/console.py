@@ -15,6 +15,8 @@ def parse():
     
     sp_get = sp.add_parser('get', help='Gets the value for a specific key in the configuration.')
     sp_set = sp.add_parser('set', help='Sets the value for a specific key in the configuration.')
+    sp_parse = sp.add_parser('parse', help='Parses and saves previously set keys')
+    
     sp_get.add_argument('-k', '--key',
                         help='The key to retrieve.', dest='key', required=True)
     sp_set.add_argument('-k', '--key',
