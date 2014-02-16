@@ -7,7 +7,7 @@ s = 'schema/'
 
 setup(
     name='lazyconf',
-    version='0.5.0',
+    version='0.5.1',
     author='Fareed Dudhia',
     author_email='fareeddudhia@gmail.com',
     packages=find_packages(),
