@@ -6,9 +6,6 @@ from lib.prompt import *
 from lib.select import *
 from lib.merge import *
 
-we need to somehow load the schema selects so that we can parse inputted data in 'set'.
-
-
 ### Lazyconf ###
 ### Our main class. Annotate public functions better.
 
@@ -22,12 +19,12 @@ class Lazyconf():
     @property
     def data_file(self):
         path = os.getcwd() + '/' + self.lazy_folder
-        return self.path + self.data_filename
+        return path + self.data_filename
 
     @property
     def schema_file(self):
         path = os.getcwd() + '/' + self.lazy_folder
-        return self.path + self.schema_filename
+        return path + self.schema_filename
 
     # Initialisation.
     def __init__(self):
@@ -144,35 +141,35 @@ class Lazyconf():
             if t is dict:
                 self.configure_data(v, s)
             else:
-                self.parse_value(data, k, s, None, v)
+                self.parse_value(data, prefix, k, s, None, v)
 
 
-    def parse_value(self, inner_dict, key, full_key, value, default):
-        t = type(value)
+    def parse_value(self, inner_dict, prefix, key, full_key, value, default):
+        t = type(default)
 
         if t is dict:
             return
     
         select = self.data.get_select(full_key)
-    
+
         if select:
-            data[key] = self.prompt.select(prefix + self.data.get_label(full_key), select, value, default = default)
+            inner_dict[key] = self.prompt.select(prefix + self.data.get_label(full_key), select, value, default = default)
 
         # If the value type is a boolean, prompt a boolean.
         elif t is bool:
-            data[key] = self.prompt.bool(prefix + self.data.get_label(full_key), value, default = default)
+            inner_dict[key] = self.prompt.bool(prefix + self.data.get_label(full_key), value, default = default)
 
         # If the value is an int, prompt and int.
         elif t is int:
-            data[key] = self.prompt.int(prefix + self.data.get_label(full_key), value, default = default)
+            inner_dict[key] = self.prompt.int(prefix + self.data.get_label(full_key), value, default = default)
 
         # If someone has put a list in data, we default it to an empty string. If it had come from the schema, it would already be a string.
         elif t is list:
-            data[key] = self.prompt.prompt(prefix + self.data.get_label(full_key) + ':', value, default = '')
+            inner_dict[key] = self.prompt.prompt(prefix + self.data.get_label(full_key) + ':', value, default = '')
 
         # If none of the above are true, it's a string.
         else:
-            data[key] = self.prompt.prompt(prefix + self.data.get_label(full_key) + ':', value, default = default)
+            inner_dict[key] = self.prompt.prompt(prefix + self.data.get_label(full_key) + ':', value, default = default)
 
 
     # Loads the schema from a schema file.
@@ -257,13 +254,11 @@ class Lazyconf():
             d = d.setdefault(k, {})
 
         schema = Schema().load(self.schema_file)
-        self.data.internal = schema.internal
-        
-        self.parse_value(d, latest, key, value, None)
 
-    def parse(self):
-        self.configure_data(self.data)
-        self.save(self.data_file)
+        self.data.internal = schema.internal
+
+        self.parse_value(d, '', latest, key, value, schema.get(key))
+        self.data.save(self.data_file)
 
     # Get the data for a dot-notated key.
     def get(self, key):
