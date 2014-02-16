@@ -1,7 +1,7 @@
-### Merge ###
-### This class is used to merge variables in the schema dictionary into the data dictionary, without losing defaults.
-### It never returns the dictionaries, as the original dictionaries are passed by reference automatically.
-### The schema dictionary is never be modified by this class.
+
+""" Merge used to merge variables in the schema dictionary into the data dictionary, without losing defaults.
+    It never returns the dictionaries, as the original dictionaries are passed by reference automatically.
+    The schema dictionary is never be modified by this class. """
 
 class Merge():
 
