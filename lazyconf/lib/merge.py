@@ -25,7 +25,6 @@ class Merge():
     def removed(self):
         return self.set_data - self.intersect
 
-
     # This method recursively merges all changes in the schema into the data file.
     def merge(self, schema = None, data = None, prefix = None):
         

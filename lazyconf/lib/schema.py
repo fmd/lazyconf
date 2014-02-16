@@ -11,13 +11,11 @@ class Schema():
         self.data = None
         self.internal = None
 
-
     # Gets a list by its dot-notated key.
     def get_select(self, k):
         if k in self.internal['selects'].keys():
             return Select(self.internal['selects'][k])
         return None
-
 
     # Gets a label by its dot-notated key.
     def get_label(self, label):

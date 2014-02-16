@@ -6,7 +6,6 @@ class Select():
     def __init__(self, d):
         self.dict = d
 
-
     # Gets the key from a value in a select.
     def get_key(self, v):
         for k,val in self.dict.iteritems():
@@ -26,7 +25,6 @@ class Select():
 
     def choices(self):
         return '(' + ','.join(sorted(self.dict.keys())) + ')'
-
 
     def reg_choices(self):
         return '^(' + '|'.join(self.dict.keys()) + ')$'.encode('string_escape');

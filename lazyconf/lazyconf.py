@@ -228,8 +228,9 @@ class Lazyconf():
         # Save the data to the out file.
         self.data.save(self.data_file)
 
+        self.add_ignore()
+
         sp, sf = os.path.split(self.data_file)
-        self.add_ignore(sf)
         self.prompt.success('Saved to ' + self.lazy_folder + sf + '.')
 
     def parse_value(self, inner_dict, label, key, value, default):
@@ -255,6 +256,7 @@ class Lazyconf():
 
         # If the value type is a boolean, prompt a boolean.
         elif t is bool:
+            print 'as'
             inner_dict[k] = self.prompt.bool(label, value, default = default)
 
         # If the value is an int, prompt and int.
