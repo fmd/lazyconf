@@ -1,5 +1,4 @@
-### Select ###
-### This class contains functions for getting keys from values, values from keys, and regex helpers for selecting a value from a list.
+""" Select contains functions for getting keys from values, values from keys, and regex helpers for selecting a value from a list. """
 
 class Select():
 
