@@ -19,7 +19,6 @@
         "labels": {
             "project": "Project Settings", 
             "db.engine": "Database Engine", 
-            "logging": "Logger settings", 
             "cache.location": "Caching location", 
             "db.name": "Database name (Not username!)", 
             "project.dir": "Full path to project", 
@@ -30,11 +29,8 @@
             "cache": "Cache Settings", 
             "db.user": "Database username", 
             "env": "Application Environment", 
-            "logging.log_level": "Logging verbosity level", 
             "cache._enabled": "Enable caching", 
-            "logging._enabled": "Enable logging", 
             "env.debug": "Debug mode",
-            "aws.bucket_name": "AWS bucket name"
         }, 
         "selects": {
             "cache.backend": {
