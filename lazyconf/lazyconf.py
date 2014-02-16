@@ -227,6 +227,20 @@ class Lazyconf():
         self.add_ignore(sf)
         self.prompt.success('Saved to ' + self.lazy_folder + sf + '.')
 
+    
+
+    def set(self, key, value):
+        path = os.getcwd() + '/' + self.lazy_folder
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        schema_file = path + self.schema_filename
+        data_file = path + self.data_filename
+        out_file = data_file
+
+        self.data.set(key, value)
+        self.data.save(out_file)
+
 
     # Get the data for a dot-notated key.
     def get(self, key):
