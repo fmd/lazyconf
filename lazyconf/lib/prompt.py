@@ -31,66 +31,71 @@ class Prompt():
         print(Colors.blue + msg + Colors.end)
 
 
+    def validate_prompt(self, value, validate):
+
+        if callable(validate):
+            try:
+                value = validate(value)
+            except Exception, e:
+
+                # If the regex fails, loop.
+                value = None
+                self.error("Validation failed for the following reason:")
+                self.error(indent(e.message) + '\n')
+
+        # Attempt to validate it if it's not callable.
+        else:
+            if not validate.startswith('^'):
+                validate = r'^' + validate
+
+            if not validate.endswith('$'):
+                validate += r'$'
+
+            result = re.findall(validate, value)
+            if not result:
+                self.error("Regular expression validation failed: '%s' does not match '%s'\n" % (value, validate))
+
+                # If the regex fails, loop.
+                value = None
+
+        return value
+
     # The prompt string method.
     # This method heavily models how it works in Fabric.
-    def string(self, label, default='', validate=None):
+    def prompt(self, label, value=None, default='', validate=None):
         
         p = label + ' ' + '[%s]' % str(default).strip() + ' '
-        value = None
-        while value is None:
+        prompt_string = None
 
-            # Get the raw input.
-            value = raw_input(p) or default
-            if validate:
-
-                # Attempt to validate the string if it's callable.
-                if callable(validate):
-                    try:
-                        value = validate(value)
-                    except Exception, e:
-
-                        # If the regex fails, loop.
-                        value = None
-                        self.error("Validation failed for the following reason:")
-                        self.error(indent(e.message) + '\n')
-
-                # Attempt to validate it if it's not callable.
-                else:
-                    if not validate.startswith('^'):
-                        validate = r'^' + validate
-
-                    if not validate.endswith('$'):
-                        validate += r'$'
-
-                    result = re.findall(validate, value)
-                    if not result:
-                        self.error("Regular expression validation failed: '%s' does not match '%s'\n" % (value, validate))
-
-                        # If the regex fails, loop.
-                        value = None
+        if not value:
+            while prompt_string is None:
+                prompt_string = raw_input(p) or default
+                value = self.validate_prompt(prompt_string, validate)
+        else:
+            value = self.validate_prompt(value, validate)
 
         return value
 
     ### Prompts ###
 
     # Returns the value from a validated int prompt.
-    def int(self, label, default = 0):
-        val = self.string(label + ' (int):', default = str(default), validate = r'^[0-9]+$')
-        return int(val)
+    def int(self, label, value=None, default = 0):
+        ret = self.prompt(label + ' (int):', value=value, default = str(default), validate = r'^[0-9]+$')
+        return int(ret)
 
 
     # Returns the value from a validated bool prompt.
-    def bool(self, label, default = False):
-        val = self.string(label + ' (y/n):', default = self.fmt_bool(default), validate = r'^(y|n)$')
-        return self.defmt_bool(val)
+    def bool(self, label, value=None, default = False):
+        ret = self.prompt(label + ' (y/n):', value=value, default = self.fmt_bool(default), validate = r'^(y|n)$')
+        return self.defmt_bool(ret)
 
 
     # Returns the value from a validated select prompt.
-    def select(self, label, select, default = ""):
-        deft = select.get_key(default)
-        if not deft:
-            deft = select.first_choice()
-        return select.get_value(self.string(label + ' ' + select.choices() + ':', default = deft, validate = select.reg_choices()))
+    def select(self, label, select, value=None, default = ""):
+        dflt = select.get_key(default)
+        if not dflt:
+            dflt = select.first_choice()
+        return select.get_value(self.prompt(label + ' ' + select.choices() + ':', value=value, default = dflt, validate = select.reg_choices()))
 
 
     ### Formatting ###
