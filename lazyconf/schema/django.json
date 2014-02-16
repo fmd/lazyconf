@@ -1,52 +1,48 @@
 {
+    "env": {
+        "debug": true,
+        "domain": "",
+        "secret-key": ""
+    }, 
+    "db": {
+        "engine": "", 
+        "user": "", 
+        "name": "", 
+        "pass": ""
+    }, 
     "cache": {
         "_enabled": false, 
         "location": "127.0.0.1:11211", 
         "backend": ""
-    }, 
-    "db": {
-        "engine": "",  
-        "user": "", 
-        "name": "",
-        "pass": ""
-    }, 
-    "env": {
-        "debug": true
     },
-    "logging": {
-        "logfile": "whatever",
-        "log_level": 4,
-        "_enabled": false
-    },
-
-    "_internal" : {
+    "_internal": {
         "labels": {
-            "project": "Project Settings",
-            "cache": "Cache Settings",
-            "db": "Database Connection",
-            "env": "Application Environment",
-            "logging": "Logger settings",
-            "logging.log_level": "Logging verbosity level",
-            "logging._enabled": "Enable logging",
-
+            "project": "Project Settings", 
+            "db.engine": "Database Engine", 
+            "logging": "Logger settings", 
+            "cache.location": "Caching location", 
+            "db.name": "Database name (Not username!)", 
+            "project.dir": "Full path to project", 
+            "db": "Database Connection", 
+            "project._enabled": "Enable project settings", 
             "cache.backend": "Caching backend", 
-            "cache.location": "Caching location",
-            "project._enabled": "Enable project settings",
-            "cache._enabled": "Enable caching",
-            "project.dir": "Full path to project",
+            "db.pass": "Database password", 
+            "cache": "Cache Settings", 
+            "db.user": "Database username", 
+            "env": "Application Environment", 
+            "logging.log_level": "Logging verbosity level", 
+            "cache._enabled": "Enable caching", 
+            "logging._enabled": "Enable logging", 
             "env.debug": "Debug mode",
-            "db.engine":"Database Engine",
-            "db.name":"Database name (Not username!)",
-            "db.user":"Database username",
-            "db.pass":"Database password"
-        },
+            "aws.bucket_name": "AWS bucket name"
+        }, 
         "selects": {
-            "db.engine": {
-                "postgres" : "django.db.backends.postgresql_psycopg2",
-                "mysql"    : "django.db.backends.mysql"
-            },
             "cache.backend": {
-                "memcached" : "django.core.cache.backends.memcached.MemcachedCache"
+                "memcached": "django.core.cache.backends.memcached.MemcachedCache"
+            }, 
+            "db.engine": {
+                "postgres": "django.db.backends.postgresql_psycopg2", 
+                "mysql": "django.db.backends.mysql"
             }
         }
     }
