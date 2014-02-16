@@ -44,7 +44,7 @@ Or, you can include it in a Python file, and use the 'load' function to load any
 If the python file loading lazyconf is not in the same folder as `.lazy/`, you can point it at `.lazy/` manually:
 
     >>> import lazyconf
-    >>> l = lazyconf.Lazyconf().load('home/fareed/.lazy/')
+    >>> l = lazyconf.Lazyconf().load('/home/fareed/.lazy/')
     >>> l.get('db.engine')
     'django.db.backends.postgresql_psycopg2'
 
