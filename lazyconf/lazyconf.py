@@ -6,46 +6,50 @@ from lib.prompt import *
 from lib.select import *
 from lib.merge import *
 
-### Lazyconf ###
-### Our main class. Annotate public functions better.
+""" Lazyconf: Insultingly simple configuration for python applications. """
 
 class Lazyconf():
 
     lazy_folder = '.lazy/'
-    ignore_file = '.gitignore'
+    ignore_filename = '.gitignore'
     schema_filename = 'lazy.schema.json'
     data_filename = 'lazy.json'
 
     @property
     def data_file(self):
+        """ Gets the full path to the file in which to save/load configured data. """
         path = os.getcwd() + '/' + self.lazy_folder
         return path + self.data_filename
 
     @property
     def schema_file(self):
+        """ Gets the full path to the file in which to load configuration schema. """
         path = os.getcwd() + '/' + self.lazy_folder
         return path + self.schema_filename
 
-    # Initialisation.
     def __init__(self):
+        """ Creates the Prompt instance, and initialises the object to hold configured data. """
         self.prompt = Prompt()
         self.data = None
     
-
-    # Creates the self.lazy_folder if it doesn't already exist, and writes the .gitignore.
-    def add_ignore(self, line):
-        path = self.lazy_folder + self.ignore_file
+    def add_ignore(self):
+        """ Writes a .gitignore file to ignore the generated data file. """
+        path = self.lazy_folder + self.ignore_filename
+        
+        # If the file exists, return.
         if os.path.isfile(os.path.realpath(path)):
-            return
+            return None
 
+        sp, sf = os.path.split(self.data_file)
+
+        #Write the file.
         try:
             handle = open(path,'w')
-            handle.write(line + '\n')
+            handle.write(sf + '\n')
         except IOError as e:
             raise e
 
         handle.close()
-
 
     # Finds all schema templates and prompts to choose one. Copies the file to self.lazy_folder.
     def choose_schema(self, out_file):
