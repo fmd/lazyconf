@@ -1,9 +1,8 @@
 import json
 from select import *
 
-### Schema ###
-### This class is used to load and store a dictionary from a config file.
-### It contains methods to load data, dump data, and retrieve data from the dictionary.
+""" Schema is used to load and store a dictionary from a config file.
+    It contains methods to load data, dump data, and retrieve data from the dictionary. """
 
 class Schema():
 
