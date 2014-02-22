@@ -1,36 +1,20 @@
 {
-    "env": {
-        "debug": true,
-        "domain": "",
-        "secret-key": ""
-    }, 
-    "db": {
-        "engine": "", 
-        "user": "", 
-        "name": "", 
-        "pass": ""
-    }, 
-    "cache": {
-        "_enabled": false, 
-        "location": "127.0.0.1:11211", 
-        "backend": ""
-    },
     "_internal": {
         "labels": {
             "project": "Project Settings", 
-            "db.engine": "Database Engine", 
+            "project.dir": "Full path to project", 
             "cache.location": "Caching location", 
             "db.name": "Database name (Not username!)", 
-            "project.dir": "Full path to project", 
+            "db.engine": "Database Engine", 
             "db": "Database Connection", 
             "project._enabled": "Enable project settings", 
-            "cache.backend": "Caching backend", 
             "db.pass": "Database password", 
-            "cache": "Cache Settings", 
+            "cache.backend": "Caching backend", 
             "db.user": "Database username", 
+            "cache": "Cache Settings", 
             "env": "Application Environment", 
-            "cache._enabled": "Enable caching", 
-            "env.debug": "Debug mode"
+            "env.debug": "Debug mode", 
+            "cache._enabled": "Enable caching"
         }, 
         "selects": {
             "cache.backend": {
@@ -38,8 +22,25 @@
             }, 
             "db.engine": {
                 "postgres": "django.db.backends.postgresql_psycopg2", 
-                "mysql": "django.db.backends.mysql"
+                "mysql": "django.db.backends.mysql",
+		"sqlite": "django.db.backends.sqlite3"
             }
         }
+    }, 
+    "cache": {
+        "_enabled": false, 
+        "location": "127.0.0.1:11211", 
+        "backend": ""
+    }, 
+    "db": {
+	"_enabled": false,
+        "engine": "",
+        "user": "", 
+        "name": "", 
+        "pass": ""
+    }, 
+    "env": {
+        "debug": true, 
+        "secret_key": ""
     }
 }
