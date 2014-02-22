@@ -5,6 +5,8 @@
 
 # lazyconf
 lazyconf is an insultingly simple tool for configuring python applications. 
+Use lazyconf to keep all of your app's configuration out of version control.
+See the django-base example for an example of how to use lazyconf. 
 
 ## Dependencies
 * Python 2.7
