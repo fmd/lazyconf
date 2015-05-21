@@ -4,6 +4,8 @@
 [![PyPi downloads](https://pypip.in/d/lazyconf/badge.png)](https://crate.io/packages/lazyconf/)
 
 # lazyconf
+
+[![Join the chat at https://gitter.im/fmd/lazyconf](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/fmd/lazyconf?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 lazyconf is an insultingly simple tool for configuring python applications. 
 Use lazyconf to keep all of your app's configuration out of version control.
 See the django-base example for an example of how to use lazyconf. 
